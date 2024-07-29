@@ -7,6 +7,12 @@ import { Icon } from "@iconify/react";
 import { Slider } from "@/components/ui/slider";
 import ReactPlayer from "react-player";
 import { appWindow } from "@tauri-apps/api/window";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -18,9 +24,12 @@ function Index() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState([0]);
+  const [hoveredTime, setHoveredTime] = useState("0");
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
+  const [currentTooltipLeft, setCurrentTooltipLeft] = useState(0);
+
   const [hideControlsTimeout, setHideControlsTimeout] =
     useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
@@ -80,7 +89,9 @@ function Index() {
     const secs = Math.floor(seconds % 60);
 
     const formattedHours = hours.toString().padStart(1, "0");
-    const formattedMinutes = minutes.toString().padStart(1, "0");
+    const formattedMinutes = minutes
+      .toString()
+      .padStart(formattedHours !== "0" ? 2 : 1, "0");
     const formattedSeconds = secs.toString().padStart(2, "0");
 
     return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
@@ -119,6 +130,32 @@ function Index() {
       handlePlayPause();
     }
   }
+
+  function handleSliderMouseMove(
+    event: React.MouseEvent<HTMLDivElement, MouseEvent>
+  ) {
+    const sliderElement = event.currentTarget;
+    const { left, width } = sliderElement.getBoundingClientRect();
+    const mouseX = event.clientX;
+    const fraction = (mouseX - left) / width;
+    const viewportWidth = window.innerWidth;
+
+    const tooltipWidth = 80;
+    let tooltipLeft = mouseX - viewportWidth / 2 - tooltipWidth / 2;
+
+    if (tooltipLeft < 0 - viewportWidth / 2) {
+      tooltipLeft = 0 - viewportWidth / 2;
+    } else if (tooltipLeft + tooltipWidth > viewportWidth / 2) {
+      tooltipLeft = viewportWidth / 2 - tooltipWidth;
+    }
+
+    setCurrentTooltipLeft(tooltipLeft);
+
+    const hoveredTime =
+      video && formatDuration(video?.getDuration() * fraction);
+    setHoveredTime(hoveredTime || "0");
+  }
+
   useEffect(() => {
     async function tauriListener() {
       await appWindow.listen(
@@ -169,12 +206,32 @@ function Index() {
             onClick={(e) => handleClick(e)}
           >
             <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit">
-              <Slider
-                max={1}
-                step={0.00001}
-                value={sliderValue}
-                onValueChange={handleSeek}
-              />
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <Slider
+                      max={1}
+                      step={0.00001}
+                      value={sliderValue}
+                      onValueChange={handleSeek}
+                      onMouseMove={handleSliderMouseMove}
+                    />
+                  </TooltipTrigger>
+                  <TooltipContent
+                    className="w-20 flex justify-center"
+                    style={{
+                      position: "absolute",
+                      left: `${currentTooltipLeft}px`,
+                      bottom: `10px`,
+                      // transform: `translate(-${window.innerWidth / 2}px, -100%)`,
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <span className="text-center w-16">{hoveredTime}</span>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+
               <div className="flex items-center">
                 {currentIndex > 0 ? (
                   <Button
