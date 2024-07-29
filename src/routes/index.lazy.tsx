@@ -45,6 +45,19 @@ function Index() {
       event.preventDefault();
       setIsPlaying((prev) => !prev);
     }
+
+    if (event.key === "Enter") {
+      event.preventDefault();
+      handleFullscreen();
+    }
+  }
+
+  async function handleFullscreen() {
+    if (await appWindow.isFullscreen()) {
+      appWindow.setFullscreen(false);
+    } else {
+      appWindow.setFullscreen(true);
+    }
   }
   interface onProgressProps {
     played: number;
@@ -136,29 +149,37 @@ function Index() {
           <div
             className={`absolute w-full h-full z-50 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
           >
-            <div className="absolute bottom-0 pb-2 w-full h-fit z-50">
-              {" "}
+            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit z-50">
               <Slider
                 max={1}
                 step={0.00001}
                 value={sliderValue}
                 onValueChange={handleSeek}
               />
-              <Button
-                size="icon"
-                className="bg-transparent rounded-full z-50"
-                onClick={handlePlayPause}
-              >
-                {isPlaying ? (
-                  <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
-                ) : (
-                  <Icon icon="mingcute:play-fill" className="h-8 w-8" />
-                )}
-              </Button>
-              <span className="text-white">
-                {formatDuration(playedSeconds)} /{" "}
-                {formatDuration(videoDuration)}
-              </span>
+              <div className="flex items-center">
+                <Button
+                  size="icon"
+                  className="bg-transparent rounded-full z-50"
+                  onClick={handlePlayPause}
+                >
+                  {isPlaying ? (
+                    <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
+                  ) : (
+                    <Icon icon="mingcute:play-fill" className="h-8 w-8" />
+                  )}
+                </Button>
+                <span className="text-white">
+                  {formatDuration(playedSeconds)} /{" "}
+                  {formatDuration(videoDuration)}
+                </span>
+                <Button
+                  size="icon"
+                  className="bg-transparent rounded-full z-50"
+                  onClick={handleFullscreen}
+                >
+                  <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
+                </Button>
+              </div>
             </div>
           </div>
 
