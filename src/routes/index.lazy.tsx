@@ -104,6 +104,14 @@ function Index() {
       clearTimeout(hideControlsTimeout);
     }
   }
+  function handleNext() {
+    currentIndex < currentFileList.length - 1
+      ? setCurrentIndex((prev) => prev + 1)
+      : null;
+  }
+  function handlePrev() {
+    currentIndex > 0 ? setCurrentIndex((prev) => prev - 1) : null;
+  }
   useEffect(() => {
     async function tauriListener() {
       await appWindow.listen(
@@ -133,12 +141,15 @@ function Index() {
     setCurrentIndex(0);
     currentFileList &&
       setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFileList]);
 
   useEffect(() => {
     currentFileList &&
       setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
+    setIsPlaying(true);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentIndex]);
 
@@ -147,9 +158,9 @@ function Index() {
       {currentFileList?.length > 0 ? (
         <>
           <div
-            className={`absolute w-full h-full z-50 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+            className={`absolute w-full h-full z-10 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
           >
-            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit z-50">
+            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit">
               <Slider
                 max={1}
                 step={0.00001}
@@ -157,9 +168,22 @@ function Index() {
                 onValueChange={handleSeek}
               />
               <div className="flex items-center">
+                {currentIndex > 0 ? (
+                  <Button
+                    size="icon"
+                    className="bg-transparent rounded-full"
+                    onClick={handlePrev}
+                  >
+                    <Icon
+                      icon="mingcute:skip-previous-fill"
+                      className="h-8 w-8"
+                    />
+                  </Button>
+                ) : null}
+
                 <Button
                   size="icon"
-                  className="bg-transparent rounded-full z-50"
+                  className="bg-transparent rounded-full"
                   onClick={handlePlayPause}
                 >
                   {isPlaying ? (
@@ -168,13 +192,25 @@ function Index() {
                     <Icon icon="mingcute:play-fill" className="h-8 w-8" />
                   )}
                 </Button>
+                {currentIndex < currentFileList.length - 1 ? (
+                  <Button
+                    size="icon"
+                    className="bg-transparent rounded-full"
+                    onClick={handleNext}
+                  >
+                    <Icon
+                      icon="mingcute:skip-forward-fill"
+                      className="h-8 w-8"
+                    />
+                  </Button>
+                ) : null}
                 <span className="text-white">
                   {formatDuration(playedSeconds)} /{" "}
                   {formatDuration(videoDuration)}
                 </span>
                 <Button
                   size="icon"
-                  className="bg-transparent rounded-full z-50"
+                  className="bg-transparent rounded-full"
                   onClick={handleFullscreen}
                 >
                   <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
