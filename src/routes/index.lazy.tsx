@@ -19,8 +19,12 @@ function Index() {
   const [sliderValue, setSliderValue] = useState([0]);
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [controlsVisible, setControlsVisible] = useState(true);
+  const [hideControlsTimeout, setHideControlsTimeout] =
+    useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
+
   async function handleFiles() {
     if (currentFileList.length === 0) {
       const fileList: string[] = await invoke("open_file_picker");
@@ -67,14 +71,39 @@ function Index() {
 
     return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
   }
+
+  function handleMouseMove() {
+    setControlsVisible(true);
+    if (hideControlsTimeout) {
+      clearTimeout(hideControlsTimeout);
+    }
+    setHideControlsTimeout(
+      setTimeout(() => {
+        setControlsVisible(false);
+      }, 5000)
+    );
+  }
+
+  function handleMouseLeave() {
+    setControlsVisible(false);
+    if (hideControlsTimeout) {
+      clearTimeout(hideControlsTimeout);
+    }
+  }
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseout", handleMouseLeave);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseout", handleMouseLeave);
+      if (hideControlsTimeout) {
+        clearTimeout(hideControlsTimeout);
+      }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [hideControlsTimeout]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -93,7 +122,9 @@ function Index() {
     <div className="w-full h-full" onDoubleClick={handlePlayPause}>
       {currentFileList?.length > 0 ? (
         <>
-          <div className="absolute w-full h-full z-50 opacity-0 hover:opacity-100 transition-opacity">
+          <div
+            className={`absolute w-full h-full z-50 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+          >
             <div className="absolute bottom-0 pb-2 w-full h-fit z-50">
               <Button
                 size="icon"
