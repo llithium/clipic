@@ -14,7 +14,15 @@ fn main() {
 
 #[tauri::command]
 async fn open_file_picker() -> Result<Vec<PathBuf>, ()> {
-    match FileDialogBuilder::new().pick_files() {
+    match FileDialogBuilder::new()
+        .add_filter(
+            "video",
+            &[
+                "mp4", "avi", "mkv", "mov", "flv", "webm", "wmv", "mpeg", "mkv",
+            ],
+        )
+        .pick_files()
+    {
         Some(files) => Ok(files),
         None => Err(()),
     }

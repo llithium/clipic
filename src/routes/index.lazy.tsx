@@ -6,6 +6,7 @@ import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { Icon } from "@iconify/react";
 import { Slider } from "@/components/ui/slider";
 import ReactPlayer from "react-player";
+import { appWindow } from "@tauri-apps/api/window";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -91,6 +92,16 @@ function Index() {
     }
   }
   useEffect(() => {
+    async function tauriListener() {
+      await appWindow.listen(
+        "tauri://file-drop",
+        ({ payload }: { payload: string[] }) => {
+          setCurrentFileList(payload);
+        }
+      );
+    }
+    tauriListener();
+
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
@@ -126,6 +137,13 @@ function Index() {
             className={`absolute w-full h-full z-50 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
           >
             <div className="absolute bottom-0 pb-2 w-full h-fit z-50">
+              {" "}
+              <Slider
+                max={1}
+                step={0.00001}
+                value={sliderValue}
+                onValueChange={handleSeek}
+              />
               <Button
                 size="icon"
                 className="bg-transparent rounded-full z-50"
@@ -141,12 +159,6 @@ function Index() {
                 {formatDuration(playedSeconds)} /{" "}
                 {formatDuration(videoDuration)}
               </span>
-              <Slider
-                max={1}
-                step={0.00001}
-                value={sliderValue}
-                onValueChange={handleSeek}
-              />
             </div>
           </div>
 
