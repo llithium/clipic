@@ -17,6 +17,8 @@ function Index() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState([0]);
+  const [playedSeconds, setPlayedSeconds] = useState(0);
+  const [videoDuration, setVideoDuration] = useState(0);
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
   async function handleFiles() {
@@ -47,6 +49,7 @@ function Index() {
   }
   function handleProgress(progress: onProgressProps) {
     setSliderValue([progress.played]);
+    setPlayedSeconds(progress.playedSeconds);
   }
 
   useEffect(() => {
@@ -70,8 +73,8 @@ function Index() {
     <div className="w-full h-full" onDoubleClick={handlePlayPause}>
       {currentFileList?.length > 0 ? (
         <>
-          <div className="absolute w-full h-full z-50">
-            <div className="absolute bottom-2 w-full h-fit z-50">
+          <div className="absolute w-full h-full z-50 opacity-0 hover:opacity-100 transition-opacity">
+            <div className="absolute bottom-0 pb-2 w-full h-fit z-50">
               <Button
                 size="icon"
                 className="bg-transparent rounded-full z-50"
@@ -83,6 +86,9 @@ function Index() {
                   <Icon icon="mingcute:play-fill" className="h-8 w-8" />
                 )}
               </Button>
+              <span className="text-white">
+                {playedSeconds}:{videoDuration}
+              </span>
               <Slider max={1} step={0.01} value={sliderValue} />
             </div>
           </div>
@@ -93,6 +99,7 @@ function Index() {
             width={"100%"}
             height={"100%"}
             playing={isPlaying}
+            onDuration={(duration) => setVideoDuration(duration)}
             className=""
             onProgress={(onProgressProps) => {
               handleProgress(onProgressProps);
