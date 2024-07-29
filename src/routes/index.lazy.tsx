@@ -39,6 +39,15 @@ function Index() {
       setIsPlaying((prev) => !prev);
     }
   }
+  interface onProgressProps {
+    played: number;
+    loaded: number;
+    playedSeconds: number;
+    loadedSeconds: number;
+  }
+  function handleProgress(progress: onProgressProps) {
+    setSliderValue([progress.played]);
+  }
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -74,12 +83,7 @@ function Index() {
                   <Icon icon="mingcute:play-fill" className="h-8 w-8" />
                 )}
               </Button>
-              <Slider
-                defaultValue={[0]}
-                max={100}
-                step={1}
-                value={sliderValue}
-              />
+              <Slider max={1} step={0.01} value={sliderValue} />
             </div>
           </div>
 
@@ -90,6 +94,9 @@ function Index() {
             height={"100%"}
             playing={isPlaying}
             className=""
+            onProgress={(onProgressProps) => {
+              handleProgress(onProgressProps);
+            }}
             onEnded={handleEnded}
             url={currentVideo}
           ></ReactPlayer>
