@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { Icon } from "@iconify/react";
+import { Slider } from "@/components/ui/slider";
+import ReactPlayer from "react-player";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -14,8 +16,9 @@ function Index() {
   const [currentVideo, setCurrentVideo] = useState<string>();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
-  const videoRef = useRef<HTMLVideoElement>(null);
-
+  const [sliderValue, setSliderValue] = useState([0]);
+  const videoRef = useRef<ReactPlayer>(null);
+  const video = videoRef.current;
   async function handleFiles() {
     if (currentFileList.length === 0) {
       const fileList: string[] = await invoke("open_file_picker");
@@ -26,66 +29,70 @@ function Index() {
     setCurrentIndex((prevIndex) => prevIndex + 1);
   }
   function handlePlayPause() {
-    const video = videoRef.current;
-    if (video) {
-      if (!video.paused) {
-        video.pause();
-        setIsPlaying(false);
-      } else {
-        video.play();
-        setIsPlaying(true);
-      }
-    }
+    setIsPlaying((prev) => !prev);
   }
   function handleKeyDown(event: KeyboardEvent) {
+    console.log(event.key);
+
     if (event.key === " ") {
       event.preventDefault();
-      handlePlayPause();
+      setIsPlaying((prev) => !prev);
     }
   }
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("dblclick", handlePlayPause);
 
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("dblclick", handlePlayPause);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
   useEffect(() => {
     currentFileList &&
       setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
   }, [currentFileList, currentIndex]);
 
+  useEffect(() => {
+    console.log(isPlaying);
+  }, [isPlaying]);
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full" onDoubleClick={handlePlayPause}>
       {currentFileList?.length > 0 ? (
         <>
           <div className="absolute w-full h-full z-50">
             <div className="absolute bottom-2 w-full h-fit z-50">
               <Button
+                size="icon"
                 className="bg-transparent rounded-full z-50"
                 onClick={handlePlayPause}
               >
                 {isPlaying ? (
-                  <Icon icon="mingcute:pause-fill" />
+                  <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
                 ) : (
-                  <Icon icon="mingcute:play-fill" />
+                  <Icon icon="mingcute:play-fill" className="h-8 w-8" />
                 )}
               </Button>
+              <Slider
+                defaultValue={[0]}
+                max={100}
+                step={1}
+                value={sliderValue}
+              />
             </div>
           </div>
 
-          <video
+          <ReactPlayer
             ref={videoRef}
-            className="w-full h-full absolute z-0"
-            // controls
-            autoPlay
+            style={{ position: "absolute" }}
+            width={"100%"}
+            height={"100%"}
+            playing={isPlaying}
+            className=""
             onEnded={handleEnded}
-            src={currentVideo}
-          ></video>
+            url={currentVideo}
+          ></ReactPlayer>
         </>
       ) : (
         <Button className="w-full h-full absolute" onClick={handleFiles}>
