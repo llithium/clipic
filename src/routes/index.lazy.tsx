@@ -28,14 +28,14 @@ function Index() {
     }
   }
   function handleEnded() {
-    setCurrentIndex((prevIndex) => prevIndex + 1);
+    if (currentIndex < currentFileList.length - 1) {
+      setCurrentIndex((prevIndex) => prevIndex + 1);
+    }
   }
   function handlePlayPause() {
     setIsPlaying((prev) => !prev);
   }
   function handleKeyDown(event: KeyboardEvent) {
-    console.log(event.key);
-
     if (event.key === " ") {
       event.preventDefault();
       setIsPlaying((prev) => !prev);
@@ -52,6 +52,21 @@ function Index() {
     setPlayedSeconds(progress.playedSeconds);
   }
 
+  function handleSeek(value: number[]) {
+    video?.seekTo(value[0], "fraction");
+  }
+
+  function formatDuration(seconds: number) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+
+    const formattedHours = hours.toString().padStart(1, "0");
+    const formattedMinutes = minutes.toString().padStart(1, "0");
+    const formattedSeconds = secs.toString().padStart(2, "0");
+
+    return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
+  }
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
 
@@ -62,13 +77,18 @@ function Index() {
   }, []);
 
   useEffect(() => {
+    setCurrentIndex(0);
     currentFileList &&
       setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
-  }, [currentFileList, currentIndex]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentFileList]);
 
   useEffect(() => {
-    console.log(isPlaying);
-  }, [isPlaying]);
+    currentFileList &&
+      setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentIndex]);
+
   return (
     <div className="w-full h-full" onDoubleClick={handlePlayPause}>
       {currentFileList?.length > 0 ? (
@@ -87,9 +107,15 @@ function Index() {
                 )}
               </Button>
               <span className="text-white">
-                {playedSeconds}:{videoDuration}
+                {formatDuration(playedSeconds)} /{" "}
+                {formatDuration(videoDuration)}
               </span>
-              <Slider max={1} step={0.01} value={sliderValue} />
+              <Slider
+                max={1}
+                step={0.00001}
+                value={sliderValue}
+                onValueChange={handleSeek}
+              />
             </div>
           </div>
 
@@ -99,6 +125,7 @@ function Index() {
             width={"100%"}
             height={"100%"}
             playing={isPlaying}
+            progressInterval={50}
             onDuration={(duration) => setVideoDuration(duration)}
             className=""
             onProgress={(onProgressProps) => {
