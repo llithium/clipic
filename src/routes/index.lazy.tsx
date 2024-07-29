@@ -109,8 +109,15 @@ function Index() {
       ? setCurrentIndex((prev) => prev + 1)
       : null;
   }
+
   function handlePrev() {
     currentIndex > 0 ? setCurrentIndex((prev) => prev - 1) : null;
+  }
+
+  function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
+    if (event.target === event.currentTarget) {
+      handlePlayPause();
+    }
   }
   useEffect(() => {
     async function tauriListener() {
@@ -154,11 +161,12 @@ function Index() {
   }, [currentIndex]);
 
   return (
-    <div className="w-full h-full" onDoubleClick={handlePlayPause}>
+    <div className="w-full h-full">
       {currentFileList?.length > 0 ? (
         <>
           <div
-            className={`absolute w-full h-full z-10 transition-opacity ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+            className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+            onClick={(e) => handleClick(e)}
           >
             <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit">
               <Slider
