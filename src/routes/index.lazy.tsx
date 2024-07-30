@@ -19,8 +19,10 @@ export const Route = createLazyFileRoute("/")({
 });
 
 function Index() {
-  const [currentFileList, setCurrentFileList] = useState<string[]>([]);
-  const [currentVideo, setCurrentVideo] = useState<string>();
+  const [currentFileList, setCurrentFileList] = useState<FileList>([
+    { file_name: "", file_path: "", file_extension: "" },
+  ]);
+  const [currentVideo, setCurrentVideo] = useState<CurrentVideo>();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(true);
   const [sliderValue, setSliderValue] = useState([0]);
@@ -29,15 +31,33 @@ function Index() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
   const [currentTooltipLeft, setCurrentTooltipLeft] = useState(0);
-
   const [hideControlsTimeout, setHideControlsTimeout] =
     useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
 
+  interface onProgressProps {
+    played: number;
+    loaded: number;
+    playedSeconds: number;
+    loadedSeconds: number;
+  }
+
+  type FileList = File[];
+  interface File {
+    file_name: string;
+    file_path: string;
+    file_extension: string;
+  }
+  interface CurrentVideo {
+    name: string;
+    url: string;
+    extension: string;
+  }
+
   async function handleFiles() {
-    if (currentFileList.length === 0) {
-      const fileList: string[] = await invoke("open_file_picker");
+    if (currentFileList[0].file_path === "") {
+      const fileList: FileList = await invoke("open_file_picker");
       setCurrentFileList(fileList);
     }
   }
@@ -68,12 +88,7 @@ function Index() {
       appWindow.setFullscreen(true);
     }
   }
-  interface onProgressProps {
-    played: number;
-    loaded: number;
-    playedSeconds: number;
-    loadedSeconds: number;
-  }
+
   function handleProgress(progress: onProgressProps) {
     setSliderValue([progress.played]);
     setPlayedSeconds(progress.playedSeconds);
@@ -138,15 +153,16 @@ function Index() {
     const { left, width } = sliderElement.getBoundingClientRect();
     const mouseX = event.clientX;
     const fraction = (mouseX - left) / width;
-    const viewportWidth = window.innerWidth;
+    // const viewportWidth = window.innerWidth;
+    const sliderWidth = sliderElement.getBoundingClientRect().width;
 
     const tooltipWidth = 80;
-    let tooltipLeft = mouseX - viewportWidth / 2 - tooltipWidth / 2;
+    let tooltipLeft = mouseX - sliderWidth / 2 - tooltipWidth / 2;
 
-    if (tooltipLeft < 0 - viewportWidth / 2) {
-      tooltipLeft = 0 - viewportWidth / 2;
-    } else if (tooltipLeft + tooltipWidth > viewportWidth / 2) {
-      tooltipLeft = viewportWidth / 2 - tooltipWidth;
+    if (tooltipLeft < 0 - sliderWidth / 2) {
+      tooltipLeft = 0 - sliderWidth / 2;
+    } else if (tooltipLeft + tooltipWidth > sliderWidth / 2) {
+      tooltipLeft = sliderWidth / 2 - tooltipWidth;
     }
 
     setCurrentTooltipLeft(tooltipLeft);
@@ -160,8 +176,11 @@ function Index() {
     async function tauriListener() {
       await appWindow.listen(
         "tauri://file-drop",
-        ({ payload }: { payload: string[] }) => {
-          setCurrentFileList(payload);
+        async ({ payload }: { payload: string[] }) => {
+          const fileList: FileList = await invoke("open_dropped_files", {
+            files: payload,
+          });
+          setCurrentFileList(fileList);
         }
       );
     }
@@ -184,14 +203,22 @@ function Index() {
   useEffect(() => {
     setCurrentIndex(0);
     currentFileList &&
-      setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
+      setCurrentVideo({
+        name: currentFileList[currentIndex].file_name,
+        url: convertFileSrc(currentFileList[currentIndex].file_path),
+        extension: currentFileList[currentIndex].file_extension,
+      });
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentFileList]);
 
   useEffect(() => {
     currentFileList &&
-      setCurrentVideo(convertFileSrc(currentFileList[currentIndex]));
+      setCurrentVideo({
+        name: currentFileList[currentIndex].file_name,
+        url: convertFileSrc(currentFileList[currentIndex].file_path),
+        extension: currentFileList[currentIndex].file_extension,
+      });
     setIsPlaying(true);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,12 +226,17 @@ function Index() {
 
   return (
     <div className="w-full h-full">
-      {currentFileList?.length > 0 ? (
+      {currentFileList?.length > 0 && currentFileList[0].file_path !== "" ? (
         <>
           <div
             className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
             onClick={(e) => handleClick(e)}
           >
+            <div className="absolute top-0 w-full h-fit pt-2">
+              <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-white">
+                {currentVideo?.name}
+              </h1>
+            </div>
             <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit">
               <TooltipProvider>
                 <Tooltip>
@@ -297,7 +329,7 @@ function Index() {
               handleProgress(onProgressProps);
             }}
             onEnded={handleEnded}
-            url={currentVideo}
+            url={currentVideo?.url}
           ></ReactPlayer>
         </>
       ) : (
