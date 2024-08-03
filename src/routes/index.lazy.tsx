@@ -18,8 +18,30 @@ export const Route = createLazyFileRoute("/")({
   component: Index,
 });
 
+interface onProgressProps {
+  played: number;
+  loaded: number;
+  playedSeconds: number;
+  loadedSeconds: number;
+}
+
+type SelectedFileList = SelectedFile[];
+interface SelectedFile {
+  file_name: string;
+  file_path: string;
+  file_extension: string;
+}
+interface CurrentVideo {
+  name: string;
+  url: string;
+  extension: string;
+}
+
+const tooltipWidth = 80;
+const volumeStep = 0.05;
+
 function Index() {
-  const [currentFileList, setCurrentFileList] = useState<FileList>([
+  const [currentFileList, setCurrentFileList] = useState<SelectedFileList>([
     { file_name: "", file_path: "", file_extension: "" },
   ]);
   const [currentVideo, setCurrentVideo] = useState<CurrentVideo>();
@@ -38,28 +60,9 @@ function Index() {
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
 
-  interface onProgressProps {
-    played: number;
-    loaded: number;
-    playedSeconds: number;
-    loadedSeconds: number;
-  }
-
-  type FileList = File[];
-  interface File {
-    file_name: string;
-    file_path: string;
-    file_extension: string;
-  }
-  interface CurrentVideo {
-    name: string;
-    url: string;
-    extension: string;
-  }
-
   async function handleFiles() {
     if (currentFileList[0].file_path === "") {
-      const fileList: FileList = await invoke("open_file_picker");
+      const fileList: SelectedFileList = await invoke("open_file_picker");
       setCurrentFileList(fileList);
     }
   }
@@ -89,19 +92,11 @@ function Index() {
 
     if (event.key === "ArrowUp") {
       event.preventDefault();
-      if (currentVolume <= 0.95) {
-        setCurrentVolume((prev) => prev + 0.05);
-      } else {
-        setCurrentVolume(1);
-      }
+      increaseVolumeByStep();
     }
     if (event.key === "ArrowDown") {
       event.preventDefault();
-      if (currentVolume >= 0.05) {
-        setCurrentVolume((prev) => prev - 0.05);
-      } else {
-        setCurrentVolume(0);
-      }
+      decreaseVolumeByStep();
     }
     if (event.key === "m") {
       event.preventDefault();
@@ -109,6 +104,29 @@ function Index() {
     }
   }
 
+  function handleScroll(event: WheelEvent) {
+    if (event.deltaY === -100) {
+      increaseVolumeByStep();
+    }
+    if (event.deltaY === 100) {
+      decreaseVolumeByStep();
+    }
+  }
+
+  function increaseVolumeByStep() {
+    if (currentVolume <= 0.95) {
+      setCurrentVolume((prev) => prev + volumeStep);
+    } else {
+      setCurrentVolume(1);
+    }
+  }
+  function decreaseVolumeByStep() {
+    if (currentVolume >= volumeStep) {
+      setCurrentVolume((prev) => prev - volumeStep);
+    } else {
+      setCurrentVolume(0);
+    }
+  }
   async function handleFullscreen() {
     if (await appWindow.isFullscreen()) {
       appWindow.setFullscreen(false);
@@ -187,7 +205,6 @@ function Index() {
     // const viewportWidth = window.innerWidth;
     const sliderWidth = sliderElement.getBoundingClientRect().width;
 
-    const tooltipWidth = 80;
     let tooltipLeft = mouseX - sliderWidth / 2 - tooltipWidth / 2;
 
     if (tooltipLeft < 0 - sliderWidth / 2) {
@@ -208,9 +225,12 @@ function Index() {
       await appWindow.listen(
         "tauri://file-drop",
         async ({ payload }: { payload: string[] }) => {
-          const fileList: FileList = await invoke("open_dropped_files", {
-            files: payload,
-          });
+          const fileList: SelectedFileList = await invoke(
+            "open_dropped_files",
+            {
+              files: payload,
+            }
+          );
           setCurrentFileList(fileList);
         }
       );
@@ -220,10 +240,12 @@ function Index() {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
+    window.addEventListener("wheel", handleScroll);
     return () => {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
+      window.removeEventListener("wheel", handleScroll);
       if (hideControlsTimeout) {
         clearTimeout(hideControlsTimeout);
       }
@@ -263,12 +285,12 @@ function Index() {
             className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
             onClick={(e) => handleClick(e)}
           >
-            <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black">
+            <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
               <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
                 {currentVideo?.name}
               </h1>
             </div>
-            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black">
+            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
