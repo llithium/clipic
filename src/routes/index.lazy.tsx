@@ -30,7 +30,9 @@ function Index() {
   const [playedSeconds, setPlayedSeconds] = useState(0);
   const [videoDuration, setVideoDuration] = useState(0);
   const [controlsVisible, setControlsVisible] = useState(true);
+  const [currentVolume, setCurrentVolume] = useState(0.5);
   const [currentTooltipLeft, setCurrentTooltipLeft] = useState(0);
+  const [isMuted, setIsMuted] = useState(false);
   const [hideControlsTimeout, setHideControlsTimeout] =
     useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
@@ -69,7 +71,12 @@ function Index() {
   function handlePlayPause() {
     setIsPlaying((prev) => !prev);
   }
+  function handleMute() {
+    setIsMuted((prev) => !prev);
+  }
   function handleKeyDown(event: KeyboardEvent) {
+    console.log(event.key);
+
     if (event.key === " ") {
       event.preventDefault();
       setIsPlaying((prev) => !prev);
@@ -78,6 +85,27 @@ function Index() {
     if (event.key === "Enter") {
       event.preventDefault();
       handleFullscreen();
+    }
+
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      if (currentVolume <= 0.95) {
+        setCurrentVolume((prev) => prev + 0.05);
+      } else {
+        setCurrentVolume(1);
+      }
+    }
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      if (currentVolume >= 0.05) {
+        setCurrentVolume((prev) => prev - 0.05);
+      } else {
+        setCurrentVolume(0);
+      }
+    }
+    if (event.key === "m") {
+      event.preventDefault();
+      setIsMuted((prev) => !prev);
     }
   }
 
@@ -96,6 +124,9 @@ function Index() {
 
   function handleSeek(value: number[]) {
     video?.seekTo(value[0], "fraction");
+  }
+  function handleVolumeSlider(value: number[]) {
+    setCurrentVolume(value[0]);
   }
 
   function formatDuration(seconds: number) {
@@ -198,7 +229,7 @@ function Index() {
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hideControlsTimeout]);
+  }, [hideControlsTimeout, currentVolume]);
 
   useEffect(() => {
     setCurrentIndex(0);
@@ -232,12 +263,12 @@ function Index() {
             className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
             onClick={(e) => handleClick(e)}
           >
-            <div className="absolute top-0 w-full h-fit pt-2">
-              <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-white">
+            <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black">
+              <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
                 {currentVideo?.name}
               </h1>
             </div>
-            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit">
+            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black">
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger>
@@ -264,54 +295,83 @@ function Index() {
                 </Tooltip>
               </TooltipProvider>
 
-              <div className="flex items-center">
-                {currentIndex > 0 ? (
+              <div className="flex items-center justify-between px-2">
+                <div className="flex gap-2 items-center">
+                  {currentIndex > 0 ? (
+                    <Button
+                      size="icon"
+                      variant={"icon"}
+                      className="bg-transparent rounded-full"
+                      onClick={handlePrev}
+                    >
+                      <Icon
+                        icon="mingcute:skip-previous-fill"
+                        className="h-8 w-8"
+                      />
+                    </Button>
+                  ) : null}
                   <Button
                     size="icon"
+                    variant={"icon"}
                     className="bg-transparent rounded-full"
-                    onClick={handlePrev}
+                    onClick={handlePlayPause}
                   >
-                    <Icon
-                      icon="mingcute:skip-previous-fill"
-                      className="h-8 w-8"
-                    />
+                    {isPlaying ? (
+                      <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
+                    ) : (
+                      <Icon icon="mingcute:play-fill" className="h-8 w-8" />
+                    )}
                   </Button>
-                ) : null}
-
-                <Button
-                  size="icon"
-                  className="bg-transparent rounded-full"
-                  onClick={handlePlayPause}
-                >
-                  {isPlaying ? (
-                    <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
-                  ) : (
-                    <Icon icon="mingcute:play-fill" className="h-8 w-8" />
-                  )}
-                </Button>
-                {currentIndex < currentFileList.length - 1 ? (
+                  {currentIndex < currentFileList.length - 1 ? (
+                    <Button
+                      size="icon"
+                      variant={"icon"}
+                      className="bg-transparent rounded-full"
+                      onClick={handleNext}
+                    >
+                      <Icon
+                        icon="mingcute:skip-forward-fill"
+                        className="h-8 w-8"
+                      />
+                    </Button>
+                  ) : null}
+                  <span className="text-neutral-50">
+                    {formatDuration(playedSeconds)} /{" "}
+                    {formatDuration(videoDuration)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
                   <Button
                     size="icon"
-                    className="bg-transparent rounded-full"
-                    onClick={handleNext}
+                    variant={"icon"}
+                    className="bg-transparent rounded-full w-7 h-7"
+                    onClick={handleMute}
                   >
-                    <Icon
-                      icon="mingcute:skip-forward-fill"
-                      className="h-8 w-8"
-                    />
+                    {isMuted ? (
+                      <Icon
+                        icon="mingcute:volume-mute-fill"
+                        className="h-4 w-4"
+                      />
+                    ) : (
+                      <Icon icon="mingcute:volume-fill" className="h-4 w-4" />
+                    )}
                   </Button>
-                ) : null}
-                <span className="text-white">
-                  {formatDuration(playedSeconds)} /{" "}
-                  {formatDuration(videoDuration)}
-                </span>
-                <Button
-                  size="icon"
-                  className="bg-transparent rounded-full"
-                  onClick={handleFullscreen}
-                >
-                  <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
-                </Button>
+                  <Slider
+                    className="w-20"
+                    max={1}
+                    step={0.01}
+                    value={isMuted ? [0] : [currentVolume]}
+                    onValueChange={handleVolumeSlider}
+                  />
+                  <Button
+                    size="icon"
+                    variant={"icon"}
+                    className="bg-transparent rounded-full w-8 h-8"
+                    onClick={handleFullscreen}
+                  >
+                    <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
@@ -321,7 +381,9 @@ function Index() {
             style={{ position: "absolute" }}
             width={"100%"}
             height={"100%"}
+            muted={isMuted}
             playing={isPlaying}
+            volume={currentVolume}
             progressInterval={50}
             onDuration={(duration) => setVideoDuration(duration)}
             className=""
