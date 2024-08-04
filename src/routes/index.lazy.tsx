@@ -75,7 +75,12 @@ function Index() {
     setIsPlaying((prev) => !prev);
   }
   function handleMute() {
-    setIsMuted((prev) => !prev);
+    if (isMuted && currentVolume === 0) {
+      setCurrentVolume(0.5);
+      setIsMuted(false);
+    } else {
+      setIsMuted((prev) => !prev);
+    }
   }
   function handleKeyDown(event: KeyboardEvent) {
     console.log(event.key);
@@ -97,10 +102,11 @@ function Index() {
     if (event.key === "ArrowDown") {
       event.preventDefault();
       decreaseVolumeByStep();
+      console.log(currentVolume);
     }
     if (event.key === "m") {
       event.preventDefault();
-      setIsMuted((prev) => !prev);
+      handleMute();
     }
   }
 
@@ -114,6 +120,7 @@ function Index() {
   }
 
   function increaseVolumeByStep() {
+    setIsMuted(false);
     if (currentVolume <= 0.95) {
       setCurrentVolume((prev) => prev + volumeStep);
     } else {
@@ -125,6 +132,7 @@ function Index() {
       setCurrentVolume((prev) => prev - volumeStep);
     } else {
       setCurrentVolume(0);
+      setIsMuted(true);
     }
   }
   async function handleFullscreen() {
@@ -144,7 +152,13 @@ function Index() {
     video?.seekTo(value[0], "fraction");
   }
   function handleVolumeSlider(value: number[]) {
+    console.log(value);
     setCurrentVolume(value[0]);
+    if (value[0] > 0) {
+      setIsMuted(false);
+    } else {
+      setIsMuted(true);
+    }
   }
 
   function formatDuration(seconds: number) {
