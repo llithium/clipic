@@ -102,7 +102,36 @@ function Index() {
     if (event.key === "ArrowDown") {
       event.preventDefault();
       decreaseVolumeByStep();
-      console.log(currentVolume);
+    }
+    if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      const currentTime = video?.getCurrentTime() || 0;
+      video?.seekTo(currentTime - 5 < 0 ? 0 : currentTime - 5, "seconds");
+    }
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      const currentTime = video?.getCurrentTime() || 0;
+      video?.seekTo(
+        currentTime + 5 > videoDuration ? videoDuration : currentTime + 5,
+        "seconds"
+      );
+    }
+    if (event.key === "j") {
+      event.preventDefault();
+      const currentTime = video?.getCurrentTime() || 0;
+      video?.seekTo(currentTime - 30 < 0 ? 0 : currentTime - 30, "seconds");
+    }
+    if (event.key === "l") {
+      event.preventDefault();
+      const currentTime = video?.getCurrentTime() || 0;
+      video?.seekTo(
+        currentTime + 30 > videoDuration ? videoDuration : currentTime + 30,
+        "seconds"
+      );
+    }
+    if (event.key === "k") {
+      event.preventDefault();
+      handlePlayPause();
     }
     if (event.key === "m") {
       event.preventDefault();
