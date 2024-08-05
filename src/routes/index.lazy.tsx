@@ -13,6 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { SelectedFileList, usePlayerStore } from "@/lib/usePlayerStore";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -25,36 +26,41 @@ interface onProgressProps {
   loadedSeconds: number;
 }
 
-type SelectedFileList = SelectedFile[];
-interface SelectedFile {
-  file_name: string;
-  file_path: string;
-  file_extension: string;
-}
-interface CurrentVideo {
-  name: string;
-  url: string;
-  extension: string;
-}
-
 const tooltipWidth = 80;
-const volumeStep = 0.05;
 
 function Index() {
-  const [currentFileList, setCurrentFileList] = useState<SelectedFileList>([
-    { file_name: "", file_path: "", file_extension: "" },
-  ]);
-  const [currentVideo, setCurrentVideo] = useState<CurrentVideo>();
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(true);
-  const [sliderValue, setSliderValue] = useState([0]);
-  const [hoveredTime, setHoveredTime] = useState("0");
-  const [playedSeconds, setPlayedSeconds] = useState(0);
-  const [videoDuration, setVideoDuration] = useState(0);
-  const [controlsVisible, setControlsVisible] = useState(true);
-  const [currentVolume, setCurrentVolume] = useState(0.5);
-  const [currentTooltipLeft, setCurrentTooltipLeft] = useState(0);
-  const [isMuted, setIsMuted] = useState(false);
+  const {
+    currentFileList,
+    currentVideo,
+    currentIndex,
+    isPlaying,
+    sliderValue,
+    hoveredTime,
+    playedSeconds,
+    videoDuration,
+    controlsVisible,
+    currentVolume,
+    isMuted,
+    updateCurrentFileList,
+    updateCurrentVideo,
+    updateCurrentIndex,
+    updateIsPlaying,
+    updateSliderValue,
+    updateHoveredTime,
+    updatePlayedSeconds,
+    updateVideoDuration,
+    updateControlsVisible,
+    updateCurrentVolume,
+    updateIsMuted,
+    currentTooltipLeft,
+    updateCurrentTooltipLeft,
+    playPause,
+    nextVideo,
+    previousVideo,
+    increaseVolumeByStep,
+    decreaseVolumeByStep,
+  } = usePlayerStore();
+
   const [hideControlsTimeout, setHideControlsTimeout] =
     useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
@@ -63,107 +69,19 @@ function Index() {
   async function handleFiles() {
     if (currentFileList[0].file_path === "") {
       const fileList: SelectedFileList = await invoke("open_file_picker");
-      setCurrentFileList(fileList);
+      updateCurrentFileList(fileList);
     }
   }
-  function handleEnded() {
-    if (currentIndex < currentFileList.length - 1) {
-      setCurrentIndex((prevIndex) => prevIndex + 1);
-    }
-  }
-  function handlePlayPause() {
-    setIsPlaying((prev) => !prev);
-  }
+
   function handleMute() {
     if (isMuted && currentVolume === 0) {
-      setCurrentVolume(0.5);
-      setIsMuted(false);
+      updateCurrentVolume(0.5);
+      updateIsMuted(false);
     } else {
-      setIsMuted((prev) => !prev);
-    }
-  }
-  function handleKeyDown(event: KeyboardEvent) {
-    console.log(event.key);
-
-    if (event.key === " ") {
-      event.preventDefault();
-      setIsPlaying((prev) => !prev);
-    }
-
-    if (event.key === "Enter") {
-      event.preventDefault();
-      handleFullscreen();
-    }
-
-    if (event.key === "ArrowUp") {
-      event.preventDefault();
-      increaseVolumeByStep();
-    }
-    if (event.key === "ArrowDown") {
-      event.preventDefault();
-      decreaseVolumeByStep();
-    }
-    if (event.key === "ArrowLeft") {
-      event.preventDefault();
-      const currentTime = video?.getCurrentTime() || 0;
-      video?.seekTo(currentTime - 5 < 0 ? 0 : currentTime - 5, "seconds");
-    }
-    if (event.key === "ArrowRight") {
-      event.preventDefault();
-      const currentTime = video?.getCurrentTime() || 0;
-      video?.seekTo(
-        currentTime + 5 > videoDuration ? videoDuration : currentTime + 5,
-        "seconds"
-      );
-    }
-    if (event.key === "j") {
-      event.preventDefault();
-      const currentTime = video?.getCurrentTime() || 0;
-      video?.seekTo(currentTime - 30 < 0 ? 0 : currentTime - 30, "seconds");
-    }
-    if (event.key === "l") {
-      event.preventDefault();
-      const currentTime = video?.getCurrentTime() || 0;
-      video?.seekTo(
-        currentTime + 30 > videoDuration ? videoDuration : currentTime + 30,
-        "seconds"
-      );
-    }
-    if (event.key === "k") {
-      event.preventDefault();
-      handlePlayPause();
-    }
-    if (event.key === "m") {
-      event.preventDefault();
-      handleMute();
+      updateIsMuted(!isMuted);
     }
   }
 
-  function handleScroll(event: WheelEvent) {
-    if (event.deltaY === -100) {
-      increaseVolumeByStep();
-    }
-    if (event.deltaY === 100) {
-      decreaseVolumeByStep();
-    }
-  }
-
-  function increaseVolumeByStep() {
-    setIsMuted(false);
-    if (currentVolume <= 0.95) {
-      setCurrentVolume((prev) => prev + volumeStep);
-    } else {
-      setCurrentVolume(1);
-    }
-  }
-  function decreaseVolumeByStep() {
-    if (currentVolume >= volumeStep) {
-      setCurrentVolume((prev) => prev - volumeStep);
-    } else {
-      setCurrentVolume(0);
-      setIsMuted(true);
-    }
-  }
   async function handleFullscreen() {
     if (await appWindow.isFullscreen()) {
       appWindow.setFullscreen(false);
@@ -173,20 +91,19 @@ function Index() {
   }
 
   function handleProgress(progress: onProgressProps) {
-    setSliderValue([progress.played]);
-    setPlayedSeconds(progress.playedSeconds);
+    updateSliderValue([progress.played]);
+    updatePlayedSeconds(progress.playedSeconds);
   }
 
   function handleSeek(value: number[]) {
     video?.seekTo(value[0], "fraction");
   }
   function handleVolumeSlider(value: number[]) {
-    console.log(value);
-    setCurrentVolume(value[0]);
+    updateCurrentVolume(value[0]);
     if (value[0] > 0) {
-      setIsMuted(false);
+      updateIsMuted(false);
     } else {
-      setIsMuted(true);
+      updateIsMuted(true);
     }
   }
 
@@ -204,37 +121,9 @@ function Index() {
     return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
   }
 
-  function handleMouseMove() {
-    setControlsVisible(true);
-    if (hideControlsTimeout) {
-      clearTimeout(hideControlsTimeout);
-    }
-    setHideControlsTimeout(
-      setTimeout(() => {
-        setControlsVisible(false);
-      }, 5000)
-    );
-  }
-
-  function handleMouseLeave() {
-    setControlsVisible(false);
-    if (hideControlsTimeout) {
-      clearTimeout(hideControlsTimeout);
-    }
-  }
-  function handleNext() {
-    currentIndex < currentFileList.length - 1
-      ? setCurrentIndex((prev) => prev + 1)
-      : null;
-  }
-
-  function handlePrev() {
-    currentIndex > 0 ? setCurrentIndex((prev) => prev - 1) : null;
-  }
-
   function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
     if (event.target === event.currentTarget) {
-      handlePlayPause();
+      playPause();
     }
   }
 
@@ -256,13 +145,12 @@ function Index() {
       tooltipLeft = sliderWidth / 2 - tooltipWidth;
     }
 
-    setCurrentTooltipLeft(tooltipLeft);
+    updateCurrentTooltipLeft(tooltipLeft);
 
     const hoveredTime =
       video && formatDuration(video?.getDuration() * fraction);
-    setHoveredTime(hoveredTime || "0");
+    updateHoveredTime(hoveredTime || "0");
   }
-
   useEffect(() => {
     async function tauriListener() {
       await appWindow.listen(
@@ -274,11 +162,86 @@ function Index() {
               files: payload,
             }
           );
-          setCurrentFileList(fileList);
+          updateCurrentFileList(fileList);
         }
       );
     }
     tauriListener();
+    function handleKeyDown(event: KeyboardEvent) {
+      console.log(event.code);
+
+      if (event.code === "Space" || event.key === "k") {
+        event.preventDefault();
+        playPause();
+      }
+
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleFullscreen();
+      }
+
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        increaseVolumeByStep();
+      }
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        decreaseVolumeByStep();
+      }
+      if (event.key === "ArrowLeft") {
+        event.preventDefault();
+        const currentTime = video?.getCurrentTime() || 0;
+        video?.seekTo(Math.max(currentTime - 5, 0), "seconds");
+      }
+      if (event.key === "ArrowRight") {
+        event.preventDefault();
+        const currentTime = video?.getCurrentTime() || 0;
+
+        video?.seekTo(Math.min(currentTime + 5, videoDuration), "seconds");
+      }
+      if (event.key === "j") {
+        event.preventDefault();
+        const currentTime = video?.getCurrentTime() || 0;
+        video?.seekTo(Math.max(currentTime - 30, 0), "seconds");
+      }
+      if (event.key === "l") {
+        event.preventDefault();
+        const currentTime = video?.getCurrentTime() || 0;
+        video?.seekTo(Math.min(currentTime + 30, videoDuration), "seconds");
+      }
+
+      if (event.key === "m") {
+        event.preventDefault();
+        handleMute();
+      }
+    }
+
+    function handleMouseMove() {
+      updateControlsVisible(true);
+      if (hideControlsTimeout) {
+        clearTimeout(hideControlsTimeout);
+      }
+      setHideControlsTimeout(
+        setTimeout(() => {
+          updateControlsVisible(false);
+        }, 5000)
+      );
+    }
+
+    function handleMouseLeave() {
+      updateControlsVisible(false);
+      if (hideControlsTimeout) {
+        clearTimeout(hideControlsTimeout);
+      }
+    }
+    function handleScroll(event: WheelEvent) {
+      if (event.deltaY === -100) {
+        increaseVolumeByStep();
+      }
+      if (event.deltaY === 100) {
+        decreaseVolumeByStep();
+      }
+    }
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("mousemove", handleMouseMove);
@@ -289,17 +252,22 @@ function Index() {
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("wheel", handleScroll);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentVolume, updateCurrentFileList, isPlaying, videoDuration]);
+
+  useEffect(() => {
+    return () => {
       if (hideControlsTimeout) {
         clearTimeout(hideControlsTimeout);
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hideControlsTimeout, currentVolume]);
+  }, [hideControlsTimeout]);
 
   useEffect(() => {
-    setCurrentIndex(0);
+    updateCurrentIndex(0);
     currentFileList &&
-      setCurrentVideo({
+      updateCurrentVideo({
         name: currentFileList[currentIndex].file_name,
         url: convertFileSrc(currentFileList[currentIndex].file_path),
         extension: currentFileList[currentIndex].file_extension,
@@ -310,15 +278,13 @@ function Index() {
 
   useEffect(() => {
     currentFileList &&
-      setCurrentVideo({
+      updateCurrentVideo({
         name: currentFileList[currentIndex].file_name,
         url: convertFileSrc(currentFileList[currentIndex].file_path),
         extension: currentFileList[currentIndex].file_extension,
       });
-    setIsPlaying(true);
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentIndex]);
+    updateIsPlaying(true);
+  }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
 
   return (
     <div className="w-full h-full">
@@ -334,7 +300,7 @@ function Index() {
               </h1>
             </div>
             <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
-              <TooltipProvider>
+              <TooltipProvider delayDuration={200}>
                 <Tooltip>
                   <TooltipTrigger>
                     <Slider
@@ -367,7 +333,7 @@ function Index() {
                       size="icon"
                       variant={"icon"}
                       className="bg-transparent rounded-full"
-                      onClick={handlePrev}
+                      onClick={previousVideo}
                     >
                       <Icon
                         icon="mingcute:skip-previous-fill"
@@ -379,7 +345,7 @@ function Index() {
                     size="icon"
                     variant={"icon"}
                     className="bg-transparent rounded-full"
-                    onClick={handlePlayPause}
+                    onClick={playPause}
                   >
                     {isPlaying ? (
                       <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
@@ -392,7 +358,7 @@ function Index() {
                       size="icon"
                       variant={"icon"}
                       className="bg-transparent rounded-full"
-                      onClick={handleNext}
+                      onClick={nextVideo}
                     >
                       <Icon
                         icon="mingcute:skip-forward-fill"
@@ -450,12 +416,12 @@ function Index() {
             playing={isPlaying}
             volume={currentVolume}
             progressInterval={50}
-            onDuration={(duration) => setVideoDuration(duration)}
+            onDuration={(duration) => updateVideoDuration(duration)}
             className=""
             onProgress={(onProgressProps) => {
               handleProgress(onProgressProps);
             }}
-            onEnded={handleEnded}
+            onEnded={nextVideo}
             url={currentVideo?.url}
           ></ReactPlayer>
         </>
