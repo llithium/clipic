@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { invoke } from "@tauri-apps/api";
 import { convertFileSrc } from "@tauri-apps/api/tauri";
 import { Icon } from "@iconify/react";
@@ -73,14 +73,14 @@ function Index() {
     }
   }
 
-  function handleMute() {
+  const handleMute = useCallback(() => {
     if (isMuted && currentVolume === 0) {
       updateCurrentVolume(0.5);
       updateIsMuted(false);
     } else {
       updateIsMuted(!isMuted);
     }
-  }
+  }, [currentVolume, isMuted, updateCurrentVolume, updateIsMuted]);
 
   async function handleFullscreen() {
     if (await appWindow.isFullscreen()) {
@@ -253,8 +253,19 @@ function Index() {
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("wheel", handleScroll);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentVolume, updateCurrentFileList, isPlaying, videoDuration]);
+  }, [
+    currentVolume,
+    updateCurrentFileList,
+    isPlaying,
+    videoDuration,
+    playPause,
+    increaseVolumeByStep,
+    decreaseVolumeByStep,
+    video,
+    updateControlsVisible,
+    hideControlsTimeout,
+    handleMute,
+  ]);
 
   useEffect(() => {
     return () => {
@@ -263,18 +274,17 @@ function Index() {
       }
     };
   }, [hideControlsTimeout]);
-
   useEffect(() => {
     updateCurrentIndex(0);
+  }, [currentFileList, updateCurrentIndex]);
+  useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
         name: currentFileList[currentIndex].file_name,
         url: convertFileSrc(currentFileList[currentIndex].file_path),
         extension: currentFileList[currentIndex].file_extension,
       });
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentFileList]);
+  }, [currentFileList, currentIndex, updateCurrentIndex, updateCurrentVideo]);
 
   useEffect(() => {
     currentFileList &&
