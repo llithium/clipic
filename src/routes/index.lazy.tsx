@@ -13,8 +13,22 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { SelectedFileList, usePlayerStore } from "@/lib/usePlayerStore";
-
+import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
+import {
+  ContextMenu,
+  // ContextMenuCheckboxItem,
+  ContextMenuContent,
+  ContextMenuItem,
+  // ContextMenuLabel,
+  // ContextMenuRadioGroup,
+  // ContextMenuRadioItem,
+  // ContextMenuSeparator,
+  ContextMenuShortcut,
+  // ContextMenuSub,
+  // ContextMenuSubContent,
+  // ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from "@/components/ui/context-menu";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -66,12 +80,10 @@ function Index() {
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
 
-  async function handleFiles() {
-    if (currentFileList[0].file_path === "") {
-      const fileList: SelectedFileList = await invoke("open_file_picker");
-      updateCurrentFileList(fileList);
-    }
-  }
+  const handleFiles = useCallback(async () => {
+    const fileList: SelectedFileList = await invoke("open_file_picker");
+    updateCurrentFileList(fileList);
+  }, [updateCurrentFileList]);
 
   const handleMute = useCallback(() => {
     if (isMuted && currentVolume === 0) {
@@ -214,6 +226,10 @@ function Index() {
         event.preventDefault();
         handleMute();
       }
+      if (event.ctrlKey && event.key == "o") {
+        event.preventDefault();
+        handleFiles();
+      }
     }
 
     function handleMouseMove() {
@@ -265,6 +281,7 @@ function Index() {
     updateControlsVisible,
     hideControlsTimeout,
     handleMute,
+    handleFiles,
   ]);
 
   useEffect(() => {
@@ -297,149 +314,188 @@ function Index() {
   }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
 
   return (
-    <div className="w-full h-full">
-      {currentFileList?.length > 0 && currentFileList[0].file_path !== "" ? (
-        <>
-          <div
-            className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
-            onClick={(e) => handleClick(e)}
-          >
-            <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
-              <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
-                {currentVideo?.name}
-              </h1>
-            </div>
-            <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Slider
-                      max={1}
-                      step={0.00001}
-                      value={sliderValue}
-                      onValueChange={handleSeek}
-                      onMouseMove={handleSliderMouseMove}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className="w-20 flex justify-center"
-                    style={{
-                      position: "absolute",
-                      left: `${currentTooltipLeft}px`,
-                      bottom: `10px`,
-                      // transform: `translate(-${window.innerWidth / 2}px, -100%)`,
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <span className="text-center w-16">{hoveredTime}</span>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
-              <div className="flex items-center justify-between px-2">
-                <div className="flex gap-2 items-center">
-                  {currentIndex > 0 ? (
-                    <Button
-                      size="icon"
-                      variant={"icon"}
-                      className="bg-transparent rounded-full"
-                      onClick={previousVideo}
-                    >
-                      <Icon
-                        icon="mingcute:skip-previous-fill"
-                        className="h-8 w-8"
-                      />
-                    </Button>
-                  ) : null}
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full"
-                    onClick={playPause}
-                  >
-                    {isPlaying ? (
-                      <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
-                    ) : (
-                      <Icon icon="mingcute:play-fill" className="h-8 w-8" />
-                    )}
-                  </Button>
-                  {currentIndex < currentFileList.length - 1 ? (
-                    <Button
-                      size="icon"
-                      variant={"icon"}
-                      className="bg-transparent rounded-full"
-                      onClick={nextVideo}
-                    >
-                      <Icon
-                        icon="mingcute:skip-forward-fill"
-                        className="h-8 w-8"
-                      />
-                    </Button>
-                  ) : null}
-                  <span className="text-neutral-50">
-                    {formatDuration(playedSeconds)} /{" "}
-                    {formatDuration(videoDuration)}
-                  </span>
+    <ContextMenu>
+      <ContextMenuTrigger className="block h-screen w-screen">
+        <div className="w-full h-full">
+          {currentFileList?.length > 0 &&
+          currentFileList[0].file_path !== "" ? (
+            <>
+              <div
+                className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+                onClick={(e) => handleClick(e)}
+              >
+                <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
+                  <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
+                    {currentVideo?.name}{" "}
+                    {currentFileList.length > 1 &&
+                      `[${currentIndex + 1}/${currentFileList.length}]`}
+                  </h1>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full w-7 h-7"
-                    onClick={handleMute}
-                  >
-                    {isMuted ? (
-                      <Icon
-                        icon="mingcute:volume-mute-fill"
-                        className="h-4 w-4"
+                <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Slider
+                          max={1}
+                          step={0.00001}
+                          value={sliderValue}
+                          onValueChange={handleSeek}
+                          onMouseMove={handleSliderMouseMove}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent
+                        className="w-20 flex justify-center"
+                        style={{
+                          position: "absolute",
+                          left: `${currentTooltipLeft}px`,
+                          bottom: `10px`,
+                          // transform: `translate(-${window.innerWidth / 2}px, -100%)`,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        <span className="text-center w-16">{hoveredTime}</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <div className="flex items-center justify-between px-2">
+                    <div className="flex gap-2 items-center">
+                      {currentIndex > 0 ? (
+                        <Button
+                          size="icon"
+                          variant={"icon"}
+                          className="bg-transparent rounded-full"
+                          onClick={previousVideo}
+                        >
+                          <Icon
+                            icon="mingcute:skip-previous-fill"
+                            className="h-8 w-8"
+                          />
+                        </Button>
+                      ) : null}
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full"
+                        onClick={playPause}
+                      >
+                        {isPlaying ? (
+                          <Icon
+                            icon="mingcute:pause-fill"
+                            className="h-8 w-8"
+                          />
+                        ) : (
+                          <Icon icon="mingcute:play-fill" className="h-8 w-8" />
+                        )}
+                      </Button>
+                      {currentIndex < currentFileList.length - 1 ? (
+                        <Button
+                          size="icon"
+                          variant={"icon"}
+                          className="bg-transparent rounded-full"
+                          onClick={nextVideo}
+                        >
+                          <Icon
+                            icon="mingcute:skip-forward-fill"
+                            className="h-8 w-8"
+                          />
+                        </Button>
+                      ) : null}
+                      <span className="text-neutral-50">
+                        {formatDuration(playedSeconds)} /{" "}
+                        {formatDuration(videoDuration)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full w-7 h-7"
+                        onClick={handleMute}
+                      >
+                        {isMuted ? (
+                          <Icon
+                            icon="mingcute:volume-mute-fill"
+                            className="h-4 w-4"
+                          />
+                        ) : (
+                          <Icon
+                            icon="mingcute:volume-fill"
+                            className="h-4 w-4"
+                          />
+                        )}
+                      </Button>
+                      <Slider
+                        className="w-20"
+                        max={1}
+                        step={0.01}
+                        value={isMuted ? [0] : [currentVolume]}
+                        onValueChange={handleVolumeSlider}
                       />
-                    ) : (
-                      <Icon icon="mingcute:volume-fill" className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Slider
-                    className="w-20"
-                    max={1}
-                    step={0.01}
-                    value={isMuted ? [0] : [currentVolume]}
-                    onValueChange={handleVolumeSlider}
-                  />
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full w-8 h-8"
-                    onClick={handleFullscreen}
-                  >
-                    <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
-                  </Button>
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full w-8 h-8"
+                        onClick={handleFullscreen}
+                      >
+                        <Icon
+                          icon="mingcute:fullscreen-fill"
+                          className="h-6 w-6"
+                        />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          </div>
 
-          <ReactPlayer
-            ref={videoRef}
-            style={{ position: "absolute" }}
-            width={"100%"}
-            height={"100%"}
-            muted={isMuted}
-            playing={isPlaying}
-            volume={currentVolume}
-            progressInterval={50}
-            onDuration={(duration) => updateVideoDuration(duration)}
-            className=""
-            onProgress={(onProgressProps) => {
-              handleProgress(onProgressProps);
-            }}
-            onEnded={nextVideo}
-            url={currentVideo?.url}
-          ></ReactPlayer>
-        </>
-      ) : (
-        <Button className="w-full h-full absolute" onClick={handleFiles}>
-          Select Videos
-        </Button>
-      )}
-    </div>
+              <ReactPlayer
+                ref={videoRef}
+                style={{ position: "absolute" }}
+                width={"100%"}
+                height={"100%"}
+                muted={isMuted}
+                playing={isPlaying}
+                volume={currentVolume}
+                progressInterval={50}
+                onDuration={(duration) => updateVideoDuration(duration)}
+                className=""
+                onProgress={(onProgressProps) => {
+                  handleProgress(onProgressProps);
+                }}
+                onEnded={nextVideo}
+                url={currentVideo?.url}
+              ></ReactPlayer>
+            </>
+          ) : (
+            <Button className="w-full h-full absolute" onClick={handleFiles}>
+              Select Videos
+            </Button>
+          )}
+        </div>
+      </ContextMenuTrigger>
+      <ContextMenuContent className="w-64">
+        <ContextMenuItem onSelect={previousVideo} inset>
+          Previous
+          <ContextMenuShortcut></ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={nextVideo} inset>
+          Next
+          <ContextMenuShortcut></ContextMenuShortcut>
+        </ContextMenuItem>
+
+        <ContextMenuItem onSelect={handleMute} inset>
+          Mute
+          <ContextMenuShortcut>M</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={handleFullscreen} inset>
+          Fullscreen
+          <ContextMenuShortcut>Enter</ContextMenuShortcut>
+        </ContextMenuItem>
+        <ContextMenuItem onSelect={handleFiles} inset>
+          Open Files
+          <ContextMenuShortcut>Ctrl+O</ContextMenuShortcut>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 }
