@@ -277,6 +277,15 @@ function Index() {
         decreaseVolumeByStep();
       }
     }
+
+    function handleMouseDown(event: MouseEvent) {
+      if (event.button === 4) {
+        nextVideo();
+      } else if (event.button === 3) {
+        previousVideo();
+      }
+    }
+
     async function handleDrag(event: MouseEvent) {
       if (event.target === event.currentTarget && event.buttons === 1) {
         event.detail === 2
@@ -292,8 +301,8 @@ function Index() {
     window.addEventListener("wheel", handleScroll);
     draggable?.addEventListener("mousedown", handleDrag);
     draggable2?.addEventListener("mousedown", handleDrag);
-
     draggable3?.addEventListener("mousedown", handleDrag);
+    window.addEventListener("mousedown", handleMouseDown);
 
     return () => {
       unlisten.then((f) => f());
@@ -302,6 +311,7 @@ function Index() {
       draggable?.removeEventListener("mousedown", handleDrag);
       draggable2?.removeEventListener("mousedown", handleDrag);
       draggable3?.removeEventListener("mousedown", handleDrag);
+      window.removeEventListener("mousedown", handleMouseDown);
     };
   }, [
     currentVolume,
@@ -314,6 +324,8 @@ function Index() {
     video,
     handleMute,
     handleFiles,
+    previousVideo,
+    nextVideo,
   ]);
 
   useEffect(() => {
