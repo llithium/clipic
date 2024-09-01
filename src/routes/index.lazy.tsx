@@ -1,12 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { invoke } from "@tauri-apps/api";
-import { convertFileSrc } from "@tauri-apps/api/tauri";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { Icon } from "@iconify/react";
 import { Slider } from "@/components/ui/slider";
 import ReactPlayer from "react-player";
-import { appWindow } from "@tauri-apps/api/window";
+import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
+import { open } from "@tauri-apps/plugin-dialog";
+import * as path from "@tauri-apps/api/path";
 import {
   Tooltip,
   TooltipContent,
@@ -29,6 +30,8 @@ import {
   // ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { getCurrentWebview } from "@tauri-apps/api/webview";
+const appWindow = getCurrentWebviewWindow();
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -80,10 +83,49 @@ function Index() {
   const videoRef = useRef<ReactPlayer>(null);
   const video = videoRef.current;
 
+  const getFiles = useCallback(async () => {
+    const files =
+      (await open({
+        filters: [
+          {
+            name: "Video",
+            extensions: [
+              "mp4",
+              "avi",
+              "mkv",
+              "mov",
+              "flv",
+              "webm",
+              "wmv",
+              "mpeg",
+              "mkv",
+            ],
+          },
+        ],
+        multiple: true,
+        directory: false,
+      })) || [];
+
+    const fileList: SelectedFileList = await toFileList(files);
+    return fileList;
+  }, []);
+
   const handleFiles = useCallback(async () => {
-    const fileList: SelectedFileList = await invoke("open_file_picker");
-    updateCurrentFileList(fileList);
-  }, [updateCurrentFileList]);
+    const fileList: SelectedFileList = await getFiles();
+    fileList.length > 0 && updateCurrentFileList(fileList);
+  }, [getFiles, updateCurrentFileList]);
+
+  const toFileList = async (array: string[]) => {
+    return await Promise.all(
+      array.map(async (file) => {
+        return {
+          fileName: await path.basename(file),
+          filePath: file,
+          fileExtension: await path.extname(file),
+        };
+      })
+    );
+  };
 
   const handleMute = useCallback(() => {
     if (isMuted && currentVolume === 0) {
@@ -164,21 +206,20 @@ function Index() {
     updateHoveredTime(hoveredTime || "0");
   }
   useEffect(() => {
-    async function tauriListener() {
-      await appWindow.listen(
-        "tauri://file-drop",
-        async ({ payload }: { payload: string[] }) => {
-          const fileList: SelectedFileList = await invoke(
-            "open_dropped_files",
-            {
-              files: payload,
-            }
-          );
-          updateCurrentFileList(fileList);
-        }
-      );
-    }
-    tauriListener();
+    const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
+      if (event.payload.type === "drop") {
+        console.log("User dropped", event.payload.paths);
+
+        const fileList: SelectedFileList = await toFileList(
+          event.payload.paths
+        );
+
+        updateCurrentFileList(fileList);
+      } else {
+        console.log("File drop cancelled");
+      }
+    });
+
     function handleKeyDown(event: KeyboardEvent) {
       console.log(event.code);
 
@@ -264,6 +305,7 @@ function Index() {
     window.addEventListener("mouseout", handleMouseLeave);
     window.addEventListener("wheel", handleScroll);
     return () => {
+      unlisten.then((f) => f());
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
@@ -297,18 +339,18 @@ function Index() {
   useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
-        name: currentFileList[currentIndex].file_name,
-        url: convertFileSrc(currentFileList[currentIndex].file_path),
-        extension: currentFileList[currentIndex].file_extension,
+        name: currentFileList[currentIndex].fileName,
+        url: convertFileSrc(currentFileList[currentIndex].filePath),
+        extension: currentFileList[currentIndex].fileExtension,
       });
   }, [currentFileList, currentIndex, updateCurrentIndex, updateCurrentVideo]);
 
   useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
-        name: currentFileList[currentIndex].file_name,
-        url: convertFileSrc(currentFileList[currentIndex].file_path),
-        extension: currentFileList[currentIndex].file_extension,
+        name: currentFileList[currentIndex].fileName,
+        url: convertFileSrc(currentFileList[currentIndex].filePath),
+        extension: currentFileList[currentIndex].fileExtension,
       });
     updateIsPlaying(true);
   }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
@@ -317,8 +359,7 @@ function Index() {
     <ContextMenu>
       <ContextMenuTrigger className="block h-screen w-screen">
         <div className="w-full h-full">
-          {currentFileList?.length > 0 &&
-          currentFileList[0].file_path !== "" ? (
+          {currentFileList?.length > 0 && currentFileList[0].filePath !== "" ? (
             <>
               <div
                 className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}

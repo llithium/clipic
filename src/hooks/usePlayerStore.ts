@@ -2,9 +2,9 @@ import { create } from "zustand";
 
 export type SelectedFileList = SelectedFile[];
 export interface SelectedFile {
-  file_name: string;
-  file_path: string;
-  file_extension: string;
+  fileName: string;
+  filePath: string;
+  fileExtension: string;
 }
 export interface CurrentVideo {
   name: string;
@@ -49,7 +49,7 @@ type Actions = {
 const volumeStep = 0.05;
 
 export const usePlayerStore = create<State & Actions>((set) => ({
-  currentFileList: [{ file_name: "", file_path: "", file_extension: "" }],
+  currentFileList: [{ fileName: "", filePath: "", fileExtension: "" }],
   currentVideo: undefined,
   currentIndex: 0,
   isPlaying: true,
