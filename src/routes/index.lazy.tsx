@@ -32,6 +32,7 @@ import {
 } from "@/components/ui/context-menu";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { Minus, Square, X } from "lucide-react";
 const appWindow = getCurrentWebviewWindow();
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -79,7 +80,6 @@ function Index() {
 
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
-
   const video = videoRef.current;
 
   const getFiles = useCallback(async () => {
@@ -275,13 +275,6 @@ function Index() {
       }
     }
     async function handleDrag(event: MouseEvent) {
-      // if (event.detail === 2) {
-      //   console.log("2");
-
-      //   playPause();
-      // } else if (event.target === event.currentTarget) {
-      //   await getCurrentWindow().startDragging();
-      // }
       if (event.target === event.currentTarget && event.buttons === 1) {
         event.detail === 2
           ? playPause()
@@ -335,7 +328,6 @@ function Index() {
       });
     updateIsPlaying(true);
   }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
-
   return (
     <ContextMenu>
       <ContextMenuTrigger className="block h-screen w-screen">
@@ -352,6 +344,32 @@ function Index() {
                     {currentFileList.length > 1 &&
                       `[${currentIndex + 1}/${currentFileList.length}]`}
                   </h1>
+                  <div className="absolute border-red-600 flex top-0 justify-end w-full items-center">
+                    <Button
+                      size="icon"
+                      variant={"icon"}
+                      className="bg-transparent rounded-none w-8 h-8 p-2 hover:bg-neutral-400/20"
+                      onClick={() => appWindow.minimize()}
+                    >
+                      <Minus className="w-5 h-5 text-neutral-50" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant={"icon"}
+                      className="bg-transparent rounded-none w-7 h-7 p-2 hover:bg-neutral-400/20"
+                      onClick={() => appWindow.toggleMaximize()}
+                    >
+                      <Square className="w-4 h-4 text-neutral-50" />
+                    </Button>
+                    <Button
+                      size="icon"
+                      variant={"icon"}
+                      className="bg-transparent rounded-none w-8 h-8 p-2 hover:bg-red-700/80"
+                      onClick={() => appWindow.close()}
+                    >
+                      <X className="w-5 h-5 text-neutral-50" />
+                    </Button>
+                  </div>
                 </div>
                 <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
                   <TooltipProvider delayDuration={200}>
