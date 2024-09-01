@@ -31,6 +31,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
+import { getCurrentWindow } from "@tauri-apps/api/window";
 const appWindow = getCurrentWebviewWindow();
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -81,6 +82,8 @@ function Index() {
   const [hideControlsTimeout, setHideControlsTimeout] =
     useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
+  const draggableRef = useRef<HTMLDivElement>(null);
+
   const video = videoRef.current;
 
   const getFiles = useCallback(async () => {
@@ -173,12 +176,6 @@ function Index() {
     const formattedSeconds = secs.toString().padStart(2, "0");
 
     return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
-  }
-
-  function handleClick(event: React.MouseEvent<HTMLDivElement, MouseEvent>) {
-    if (event.target === event.currentTarget) {
-      playPause();
-    }
   }
 
   function handleSliderMouseMove(
@@ -299,17 +296,35 @@ function Index() {
         decreaseVolumeByStep();
       }
     }
+    async function handleDrag(event: MouseEvent) {
+      // if (event.detail === 2) {
+      //   console.log("2");
+
+      //   playPause();
+      // } else if (event.target === event.currentTarget) {
+      //   await getCurrentWindow().startDragging();
+      // }
+      if (event.target === event.currentTarget && event.buttons === 1) {
+        event.detail === 2
+          ? playPause()
+          : await getCurrentWindow().startDragging();
+      }
+    }
+    const draggable = draggableRef.current;
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("mousemove", handleMouseMove);
     window.addEventListener("mouseout", handleMouseLeave);
     window.addEventListener("wheel", handleScroll);
+    draggable?.addEventListener("mousedown", handleDrag);
+
     return () => {
       unlisten.then((f) => f());
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("wheel", handleScroll);
+      draggable?.removeEventListener("mousedown", handleDrag);
     };
   }, [
     currentVolume,
@@ -362,8 +377,8 @@ function Index() {
           {currentFileList?.length > 0 && currentFileList[0].filePath !== "" ? (
             <>
               <div
+                ref={draggableRef}
                 className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
-                onClick={(e) => handleClick(e)}
               >
                 <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
