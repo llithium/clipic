@@ -357,9 +357,9 @@ function Index() {
             <>
               <div
                 ref={draggableRef}
-                className={`absolute w-full h-full z-10 transition-opacity ease-out duration-300 opacity-0 hover:opacity-100 select-none`}
+                className={`absolute w-full h-full z-10  select-none`}
               >
-                <div className="absolute top-0 w-full z-0 h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
+                <div className="absolute top-0 w-full z-0 h-fit pt-2 bg-gradient-to-b pb-32 from-black/30 opacity-0 transition-opacity ease-out duration-700 hover:opacity-100">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
                     {currentVideo?.name}{" "}
                     {currentFileList.length > 1 &&
@@ -395,7 +395,7 @@ function Index() {
                     </Button>
                   </div>
                 </div>
-                <div className="absolute bottom-0 z-10 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
+                <div className="absolute bottom-0 z-10 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity ease-out duration-700 hover:opacity-100">
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger>
