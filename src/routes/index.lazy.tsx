@@ -344,7 +344,7 @@ function Index() {
             <>
               <div
                 ref={draggableRef}
-                className={`absolute w-full h-full z-10 transition-opacity ease-out duration-300 opacity-0 hover:opacity-100 `}
+                className={`absolute w-full h-full z-10 transition-opacity ease-out duration-300 opacity-0 hover:opacity-100 select-none`}
               >
                 <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
