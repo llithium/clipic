@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { Icon } from "@iconify/react";
 import { Slider } from "@/components/ui/slider";
@@ -56,7 +56,6 @@ function Index() {
     hoveredTime,
     playedSeconds,
     videoDuration,
-    controlsVisible,
     currentVolume,
     isMuted,
     updateCurrentFileList,
@@ -67,7 +66,6 @@ function Index() {
     updateHoveredTime,
     updatePlayedSeconds,
     updateVideoDuration,
-    updateControlsVisible,
     updateCurrentVolume,
     updateIsMuted,
     currentTooltipLeft,
@@ -79,8 +77,6 @@ function Index() {
     decreaseVolumeByStep,
   } = usePlayerStore();
 
-  const [hideControlsTimeout, setHideControlsTimeout] =
-    useState<NodeJS.Timeout | null>(null);
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
 
@@ -270,24 +266,6 @@ function Index() {
       }
     }
 
-    function handleMouseMove() {
-      updateControlsVisible(true);
-      if (hideControlsTimeout) {
-        clearTimeout(hideControlsTimeout);
-      }
-      setHideControlsTimeout(
-        setTimeout(() => {
-          updateControlsVisible(false);
-        }, 5000)
-      );
-    }
-
-    function handleMouseLeave() {
-      updateControlsVisible(false);
-      if (hideControlsTimeout) {
-        clearTimeout(hideControlsTimeout);
-      }
-    }
     function handleScroll(event: WheelEvent) {
       if (event.deltaY === -100) {
         increaseVolumeByStep();
@@ -313,16 +291,13 @@ function Index() {
     const draggable = draggableRef.current;
 
     window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseout", handleMouseLeave);
+
     window.addEventListener("wheel", handleScroll);
     draggable?.addEventListener("mousedown", handleDrag);
 
     return () => {
       unlisten.then((f) => f());
       window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseout", handleMouseLeave);
       window.removeEventListener("wheel", handleScroll);
       draggable?.removeEventListener("mousedown", handleDrag);
     };
@@ -335,19 +310,10 @@ function Index() {
     increaseVolumeByStep,
     decreaseVolumeByStep,
     video,
-    updateControlsVisible,
-    hideControlsTimeout,
     handleMute,
     handleFiles,
   ]);
 
-  useEffect(() => {
-    return () => {
-      if (hideControlsTimeout) {
-        clearTimeout(hideControlsTimeout);
-      }
-    };
-  }, [hideControlsTimeout]);
   useEffect(() => {
     updateCurrentIndex(0);
   }, [currentFileList, updateCurrentIndex]);
@@ -378,7 +344,7 @@ function Index() {
             <>
               <div
                 ref={draggableRef}
-                className={`absolute w-full h-full z-10 transition-opacity  ${controlsVisible || isPlaying === false ? "opacity-100" : "opacity-0"}`}
+                className={`absolute w-full h-full z-10 transition-opacity ease-out duration-300 opacity-0 hover:opacity-100 `}
               >
                 <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">

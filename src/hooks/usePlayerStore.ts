@@ -21,7 +21,6 @@ type State = {
   hoveredTime: string;
   playedSeconds: number;
   videoDuration: number;
-  controlsVisible: boolean;
   currentVolume: number;
   isMuted: boolean;
   currentTooltipLeft: number;
@@ -35,7 +34,6 @@ type Actions = {
   updateHoveredTime: (state: string) => void;
   updatePlayedSeconds: (state: number) => void;
   updateVideoDuration: (state: number) => void;
-  updateControlsVisible: (state: boolean) => void;
   updateCurrentVolume: (state: number) => void;
   updateIsMuted: (state: boolean) => void;
   updateCurrentTooltipLeft: (state: number) => void;
@@ -57,7 +55,6 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   hoveredTime: "0",
   playedSeconds: 0,
   videoDuration: 0,
-  controlsVisible: true,
   currentVolume: 0.5,
   isMuted: false,
   currentTooltipLeft: 0,
@@ -69,7 +66,6 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   updateHoveredTime: (state) => set({ hoveredTime: state }),
   updatePlayedSeconds: (state) => set({ playedSeconds: state }),
   updateVideoDuration: (state) => set({ videoDuration: state }),
-  updateControlsVisible: (state) => set({ controlsVisible: state }),
   updateCurrentVolume: (state) => set({ currentVolume: state }),
   updateIsMuted: (state) => set({ isMuted: state }),
   updateCurrentTooltipLeft: (state) => set({ currentTooltipLeft: state }),
