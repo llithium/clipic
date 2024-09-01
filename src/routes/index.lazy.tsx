@@ -82,6 +82,7 @@ function Index() {
   const draggableRef = useRef<HTMLDivElement>(null);
   const draggableRef2 = useRef<HTMLDivElement>(null);
   const draggableRef3 = useRef<HTMLDivElement>(null);
+  const draggableRef4 = useRef<HTMLDivElement>(null);
 
   const video = videoRef.current;
 
@@ -296,12 +297,14 @@ function Index() {
     const draggable = draggableRef.current;
     const draggable2 = draggableRef2.current;
     const draggable3 = draggableRef3.current;
+    const draggable4 = draggableRef4.current;
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("wheel", handleScroll);
     draggable?.addEventListener("mousedown", handleDrag);
     draggable2?.addEventListener("mousedown", handleDrag);
     draggable3?.addEventListener("mousedown", handleDrag);
+    draggable4?.addEventListener("mousedown", handleDrag);
     window.addEventListener("mousedown", handleMouseDown);
 
     return () => {
@@ -311,6 +314,7 @@ function Index() {
       draggable?.removeEventListener("mousedown", handleDrag);
       draggable2?.removeEventListener("mousedown", handleDrag);
       draggable3?.removeEventListener("mousedown", handleDrag);
+      draggable4?.removeEventListener("mousedown", handleDrag);
       window.removeEventListener("mousedown", handleMouseDown);
     };
   }, [
@@ -359,7 +363,7 @@ function Index() {
                 ref={draggableRef}
                 className={`absolute w-full h-full z-10  select-none`}
               >
-                <div className="absolute top-0 w-full z-0 h-fit pt-2 bg-gradient-to-b pb-32 from-black/30 opacity-0 transition-opacity ease-out duration-700 hover:opacity-100">
+                <div className="absolute top-0 w-full z-0 h-fit pt-2 bg-gradient-to-b from-black/30 opacity-0 transition-opacity duration-500 ease-fast-out hover:opacity-100">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
                     {currentVideo?.name}{" "}
                     {currentFileList.length > 1 &&
@@ -367,7 +371,7 @@ function Index() {
                   </h1>
                   <div
                     ref={draggableRef2}
-                    className="absolute border-red-600 flex top-0 justify-end w-full items-center"
+                    className="absolute pb-32 flex top-0 justify-end w-full items-center"
                   >
                     <Button
                       size="icon"
@@ -395,7 +399,11 @@ function Index() {
                     </Button>
                   </div>
                 </div>
-                <div className="absolute bottom-0 z-10 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity ease-out duration-700 hover:opacity-100">
+
+                <div
+                  ref={draggableRef4}
+                  className="absolute bottom-0 z-10 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-500 ease-fast-out hover:opacity-100"
+                >
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger>

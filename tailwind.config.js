@@ -32,6 +32,9 @@ module.exports = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
+      transitionTimingFunction: {
+        "fast-out": "cubic-bezier(0.17,0.31,0.22,1.09)",
+      },
     },
   },
   // eslint-disable-next-line no-undef
