@@ -80,6 +80,9 @@ function Index() {
 
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
+  const draggableRef2 = useRef<HTMLDivElement>(null);
+  const draggableRef3 = useRef<HTMLDivElement>(null);
+
   const video = videoRef.current;
 
   const getFiles = useCallback(async () => {
@@ -282,17 +285,23 @@ function Index() {
       }
     }
     const draggable = draggableRef.current;
+    const draggable2 = draggableRef2.current;
+    const draggable3 = draggableRef3.current;
 
     window.addEventListener("keydown", handleKeyDown);
-
     window.addEventListener("wheel", handleScroll);
     draggable?.addEventListener("mousedown", handleDrag);
+    draggable2?.addEventListener("mousedown", handleDrag);
+
+    draggable3?.addEventListener("mousedown", handleDrag);
 
     return () => {
       unlisten.then((f) => f());
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleScroll);
       draggable?.removeEventListener("mousedown", handleDrag);
+      draggable2?.removeEventListener("mousedown", handleDrag);
+      draggable3?.removeEventListener("mousedown", handleDrag);
     };
   }, [
     currentVolume,
@@ -338,13 +347,16 @@ function Index() {
                 ref={draggableRef}
                 className={`absolute w-full h-full z-10 transition-opacity ease-out duration-300 opacity-0 hover:opacity-100 select-none`}
               >
-                <div className="absolute top-0 w-full h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
+                <div className="absolute top-0 w-full z-0 h-fit pt-2 pb-2 bg-gradient-to-b from-black/30">
                   <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center text-neutral-50">
                     {currentVideo?.name}{" "}
                     {currentFileList.length > 1 &&
                       `[${currentIndex + 1}/${currentFileList.length}]`}
                   </h1>
-                  <div className="absolute border-red-600 flex top-0 justify-end w-full items-center">
+                  <div
+                    ref={draggableRef2}
+                    className="absolute border-red-600 flex top-0 justify-end w-full items-center"
+                  >
                     <Button
                       size="icon"
                       variant={"icon"}
@@ -371,7 +383,7 @@ function Index() {
                     </Button>
                   </div>
                 </div>
-                <div className="absolute bottom-0 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
+                <div className="absolute bottom-0 z-10 pb-2 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30">
                   <TooltipProvider delayDuration={200}>
                     <Tooltip>
                       <TooltipTrigger>
@@ -398,7 +410,10 @@ function Index() {
                     </Tooltip>
                   </TooltipProvider>
 
-                  <div className="flex items-center justify-between px-2">
+                  <div
+                    ref={draggableRef3}
+                    className="flex items-center justify-between px-2"
+                  >
                     <div className="flex gap-2 items-center">
                       {currentIndex > 0 ? (
                         <Button
