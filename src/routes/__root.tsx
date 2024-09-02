@@ -35,7 +35,7 @@ const __root = () => {
     <>
       <main className="dark:bg-black">
         <div
-          className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${currentFileList.length > 0 && currentFileList[0].filePath !== "" ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-500 ease-fast-out hover:opacity-100`}
+          className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${currentFileList.length > 0 ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-500 ease-fast-out hover:opacity-100`}
         >
           <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50">
             {currentVideo?.name}{" "}
@@ -44,7 +44,7 @@ const __root = () => {
           </h1>
           <div
             ref={draggableRef}
-            className={`absolute flex top-0 justify-end w-full items-center ${currentFileList.length > 0 && currentFileList[0].filePath !== "" ? "pb-32" : null}`}
+            className={`absolute flex top-0 justify-end w-full items-center ${currentFileList.length > 0 ? "pb-32" : null}`}
           >
             <Button
               size="icon"

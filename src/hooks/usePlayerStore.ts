@@ -47,7 +47,7 @@ type Actions = {
 const volumeStep = 0.05;
 
 export const usePlayerStore = create<State & Actions>((set) => ({
-  currentFileList: [{ fileName: "", filePath: "", fileExtension: "" }],
+  currentFileList: [],
   currentVideo: undefined,
   currentIndex: 0,
   isPlaying: true,

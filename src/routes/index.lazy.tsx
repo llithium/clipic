@@ -290,7 +290,7 @@ function Index() {
       }
     }
     async function handleDragMain(event: MouseEvent) {
-      if (currentFileList.length > 0 && currentFileList[0].filePath !== "") {
+      if (currentFileList.length > 0) {
         if (event.target === event.currentTarget && event.buttons === 1) {
           if (event.detail === 2) {
             playPause();
@@ -348,18 +348,18 @@ function Index() {
   useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
-        name: currentFileList[currentIndex].fileName,
-        url: convertFileSrc(currentFileList[currentIndex].filePath),
-        extension: currentFileList[currentIndex].fileExtension,
+        name: currentFileList[currentIndex]?.fileName,
+        url: convertFileSrc(currentFileList[currentIndex]?.filePath),
+        extension: currentFileList[currentIndex]?.fileExtension,
       });
   }, [currentFileList, currentIndex, updateCurrentIndex, updateCurrentVideo]);
 
   useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
-        name: currentFileList[currentIndex].fileName,
-        url: convertFileSrc(currentFileList[currentIndex].filePath),
-        extension: currentFileList[currentIndex].fileExtension,
+        name: currentFileList[currentIndex]?.fileName,
+        url: convertFileSrc(currentFileList[currentIndex]?.filePath),
+        extension: currentFileList[currentIndex]?.fileExtension,
       });
     updateIsPlaying(true);
   }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
