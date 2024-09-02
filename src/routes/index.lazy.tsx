@@ -32,6 +32,11 @@ import {
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { handleFullscreen } from "@/lib/ui";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -361,143 +366,175 @@ function Index() {
   return (
     <ContextMenu>
       <ContextMenuTrigger className="block h-screen w-screen">
-        <div className="w-full h-full">
-          <div
-            ref={draggableRef}
-            className={`absolute w-full h-full z-10  select-none`}
-          >
-            <div
-              ref={draggableRef4}
-              className="absolute bottom-0 z-10 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-500 ease-fast-out hover:opacity-100"
-            >
-              <TooltipProvider delayDuration={200}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <Slider
-                      max={1}
-                      step={0.00001}
-                      value={sliderValue}
-                      onValueChange={handleSeek}
-                      onMouseMove={handleSliderMouseMove}
-                    />
-                  </TooltipTrigger>
-                  <TooltipContent
-                    className="w-20 flex justify-center"
-                    style={{
-                      position: "absolute",
-                      left: `${currentTooltipLeft}px`,
-                      bottom: `10px`,
-                      // transform: `translate(-${window.innerWidth / 2}px, -100%)`,
-                      pointerEvents: "none",
-                    }}
-                  >
-                    <span className="text-center w-16">{hoveredTime}</span>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-
+        <ResizablePanelGroup direction="horizontal">
+          <ResizablePanel>
+            <div className="w-full h-full">
               <div
-                ref={draggableRef3}
-                className="flex items-center justify-between px-2"
+                ref={draggableRef}
+                className={`relative w-full h-full z-10 select-none`}
               >
-                <div className="flex gap-2 items-center">
-                  {currentIndex > 0 ? (
-                    <Button
-                      size="icon"
-                      variant={"icon"}
-                      className="bg-transparent rounded-full"
-                      onClick={previousVideo}
-                    >
-                      <Icon
-                        icon="mingcute:skip-previous-fill"
-                        className="h-8 w-8"
-                      />
-                    </Button>
-                  ) : null}
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full"
-                    onClick={playPause}
+                <div
+                  ref={draggableRef4}
+                  className="absolute bottom-0 z-20 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-500 ease-fast-out hover:opacity-100"
+                >
+                  <TooltipProvider delayDuration={200}>
+                    <Tooltip>
+                      <TooltipTrigger>
+                        <Slider
+                          max={1}
+                          step={0.00001}
+                          value={sliderValue}
+                          onValueChange={handleSeek}
+                          onMouseMove={handleSliderMouseMove}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent
+                        className="w-20 flex justify-center"
+                        style={{
+                          position: "absolute",
+                          left: `${currentTooltipLeft}px`,
+                          bottom: `10px`,
+                          // transform: `translate(-${window.innerWidth / 2}px, -100%)`,
+                          pointerEvents: "none",
+                        }}
+                      >
+                        <span className="text-center w-16">{hoveredTime}</span>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
+                  <div
+                    ref={draggableRef3}
+                    className="flex items-center justify-between px-2 relative z-20"
                   >
-                    {isPlaying ? (
-                      <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
-                    ) : (
-                      <Icon icon="mingcute:play-fill" className="h-8 w-8" />
-                    )}
-                  </Button>
-                  {currentIndex < currentFileList.length - 1 ? (
-                    <Button
-                      size="icon"
-                      variant={"icon"}
-                      className="bg-transparent rounded-full"
-                      onClick={nextVideo}
-                    >
-                      <Icon
-                        icon="mingcute:skip-forward-fill"
-                        className="h-8 w-8"
+                    <div className="flex gap-2 items-center">
+                      {currentIndex > 0 ? (
+                        <Button
+                          size="icon"
+                          variant={"icon"}
+                          className="bg-transparent rounded-full"
+                          onClick={previousVideo}
+                        >
+                          <Icon
+                            icon="mingcute:skip-previous-fill"
+                            className="h-8 w-8"
+                          />
+                        </Button>
+                      ) : null}
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full"
+                        onClick={playPause}
+                      >
+                        {isPlaying ? (
+                          <Icon
+                            icon="mingcute:pause-fill"
+                            className="h-8 w-8"
+                          />
+                        ) : (
+                          <Icon icon="mingcute:play-fill" className="h-8 w-8" />
+                        )}
+                      </Button>
+                      {currentIndex < currentFileList.length - 1 ? (
+                        <Button
+                          size="icon"
+                          variant={"icon"}
+                          className="bg-transparent rounded-full"
+                          onClick={nextVideo}
+                        >
+                          <Icon
+                            icon="mingcute:skip-forward-fill"
+                            className="h-8 w-8"
+                          />
+                        </Button>
+                      ) : null}
+                      <span className="text-neutral-50">
+                        {formatDuration(playedSeconds)} /{" "}
+                        {formatDuration(videoDuration)}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full w-7 h-7"
+                        onClick={handleMute}
+                      >
+                        {isMuted ? (
+                          <Icon
+                            icon="mingcute:volume-mute-fill"
+                            className="h-4 w-4"
+                          />
+                        ) : (
+                          <Icon
+                            icon="mingcute:volume-fill"
+                            className="h-4 w-4"
+                          />
+                        )}
+                      </Button>
+                      <Slider
+                        className="w-20"
+                        max={1}
+                        step={0.01}
+                        value={isMuted ? [0] : [currentVolume]}
+                        onValueChange={handleVolumeSlider}
                       />
-                    </Button>
-                  ) : null}
-                  <span className="text-neutral-50">
-                    {formatDuration(playedSeconds)} /{" "}
-                    {formatDuration(videoDuration)}
-                  </span>
+                      <Button
+                        size="icon"
+                        variant={"icon"}
+                        className="bg-transparent rounded-full w-8 h-8"
+                        onClick={handleFullscreen}
+                      >
+                        <Icon
+                          icon="mingcute:fullscreen-fill"
+                          className="h-6 w-6"
+                        />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full w-7 h-7"
-                    onClick={handleMute}
-                  >
-                    {isMuted ? (
-                      <Icon
-                        icon="mingcute:volume-mute-fill"
-                        className="h-4 w-4"
-                      />
-                    ) : (
-                      <Icon icon="mingcute:volume-fill" className="h-4 w-4" />
-                    )}
-                  </Button>
-                  <Slider
-                    className="w-20"
-                    max={1}
-                    step={0.01}
-                    value={isMuted ? [0] : [currentVolume]}
-                    onValueChange={handleVolumeSlider}
-                  />
-                  <Button
-                    size="icon"
-                    variant={"icon"}
-                    className="bg-transparent rounded-full w-8 h-8"
-                    onClick={handleFullscreen}
-                  >
-                    <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
-                  </Button>
-                </div>
+                <ReactPlayer
+                  ref={videoRef}
+                  style={{ position: "absolute" }}
+                  width={"100%"}
+                  height={"100%"}
+                  muted={isMuted}
+                  playing={isPlaying}
+                  volume={currentVolume}
+                  progressInterval={50}
+                  onDuration={(duration) => updateVideoDuration(duration)}
+                  onProgress={(onProgressProps) => {
+                    handleProgress(onProgressProps);
+                  }}
+                  onEnded={nextVideo}
+                  url={currentVideo?.url}
+                ></ReactPlayer>
+                <div
+                  ref={draggableRef2}
+                  className={`relative w-full h-full z-10 select-none`}
+                ></div>
               </div>
             </div>
-          </div>
-
-          <ReactPlayer
-            ref={videoRef}
-            style={{ position: "absolute" }}
-            width={"100%"}
-            height={"100%"}
-            muted={isMuted}
-            playing={isPlaying}
-            volume={currentVolume}
-            progressInterval={50}
-            onDuration={(duration) => updateVideoDuration(duration)}
-            className=""
-            onProgress={(onProgressProps) => {
-              handleProgress(onProgressProps);
-            }}
-            onEnded={nextVideo}
-            url={currentVideo?.url}
-          ></ReactPlayer>
-        </div>
+          </ResizablePanel>
+          <ResizableHandle className="relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8" />
+          <ResizablePanel
+            className="flex flex-col justify-end relative z-40"
+            defaultSize={25}
+          >
+            <div className="h-[calc(100vh-32px)] dark:bg-neutral-50">
+              {currentFileList.map((video, i) => {
+                return (
+                  <div>
+                    <span onClick={() => updateCurrentIndex(i)} key={i}>
+                      {video.fileName}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </ResizablePanel>
+        </ResizablePanelGroup>
       </ContextMenuTrigger>
       <ContextMenuContent className="w-64">
         <ContextMenuItem onSelect={previousVideo} inset>
