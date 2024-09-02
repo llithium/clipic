@@ -16,17 +16,11 @@ import {
 import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
 import {
   ContextMenu,
-  // ContextMenuCheckboxItem,
+  ContextMenuCheckboxItem,
   ContextMenuContent,
   ContextMenuItem,
-  // ContextMenuLabel,
-  // ContextMenuRadioGroup,
-  // ContextMenuRadioItem,
-  // ContextMenuSeparator,
+  ContextMenuSeparator,
   ContextMenuShortcut,
-  // ContextMenuSub,
-  // ContextMenuSubContent,
-  // ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
@@ -79,6 +73,8 @@ function Index() {
     previousVideo,
     increaseVolumeByStep,
     decreaseVolumeByStep,
+    isSidePanelOpen,
+    toggleSidePanel,
   } = usePlayerStore();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -259,9 +255,15 @@ function Index() {
         event.preventDefault();
         handleMute();
       }
+
       if (event.ctrlKey && event.key == "o") {
         event.preventDefault();
         handleFiles();
+      }
+
+      if (event.ctrlKey && event.key == "s") {
+        event.preventDefault();
+        toggleSidePanel();
       }
     }
 
@@ -298,7 +300,7 @@ function Index() {
             await getCurrentWindow().startDragging();
           }
         }
-      } else {
+      } else if (event.button === 0) {
         handleFiles();
       }
     }
@@ -339,6 +341,7 @@ function Index() {
     previousVideo,
     nextVideo,
     currentFileList,
+    toggleSidePanel,
   ]);
 
   useEffect(() => {
@@ -517,10 +520,13 @@ function Index() {
               </div>
             </div>
           </ResizablePanel>
-          <ResizableHandle className="relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8" />
+          <ResizableHandle
+            className={`relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8 ${!isSidePanelOpen && "hidden"}`}
+          />
           <ResizablePanel
-            className="flex flex-col justify-end"
-            defaultSize={25}
+            className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
+            minSize={10}
+            defaultSize={20}
           >
             <div className="h-[calc(100vh-32px)] dark:bg-neutral-50 relative z-40 py-2 flex flex-col gap-1 overflow-y-auto">
               {currentFileList.map((video, i) => {
@@ -564,6 +570,14 @@ function Index() {
           Open Files
           <ContextMenuShortcut>Ctrl+O</ContextMenuShortcut>
         </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuCheckboxItem
+          onSelect={toggleSidePanel}
+          checked={isSidePanelOpen}
+        >
+          Show Side Panel
+          <ContextMenuShortcut>Ctrl+S</ContextMenuShortcut>
+        </ContextMenuCheckboxItem>
       </ContextMenuContent>
     </ContextMenu>
   );
