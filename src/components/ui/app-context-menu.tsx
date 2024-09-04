@@ -52,8 +52,8 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
         >
           Show Side Panel
           <ContextMenuShortcut>Ctrl+S</ContextMenuShortcut>
-          <ContextMenuSeparator />
         </ContextMenuCheckboxItem>
+        {/* <ContextMenuSeparator /> */}
       </ContextMenuContent>
     </ContextMenu>
   );
