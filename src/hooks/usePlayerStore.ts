@@ -1,3 +1,4 @@
+import { getFiles } from "@/lib/files";
 import { create } from "zustand";
 
 export type SelectedFileList = SelectedFile[];
@@ -44,6 +45,8 @@ type Actions = {
   increaseVolumeByStep: () => void;
   decreaseVolumeByStep: () => void;
   toggleSidePanel: () => void;
+  toggleMute: () => void;
+  openFiles: () => void;
 };
 
 const volumeStep = 0.05;
@@ -99,4 +102,19 @@ export const usePlayerStore = create<State & Actions>((set) => ({
     }),
   toggleSidePanel: () =>
     set((state) => ({ isSidePanelOpen: !state.isSidePanelOpen })),
+  toggleMute: () =>
+    set((state) => {
+      if (state.isMuted && state.currentVolume === 0) {
+        state.currentVolume = 0.5;
+        return { currentVolume: 0.5, isMuted: false };
+      } else {
+        return { isMuted: !state.isMuted };
+      }
+    }),
+  openFiles: async () => {
+    const fileList: SelectedFileList = await getFiles();
+    if (fileList.length > 0) {
+      set({ currentFileList: fileList });
+    }
+  },
 }));
