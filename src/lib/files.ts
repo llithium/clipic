@@ -18,6 +18,7 @@ export async function getFiles() {
             "wmv",
             "mpeg",
             "mkv",
+            "m4v",
           ],
         },
       ],
@@ -29,7 +30,7 @@ export async function getFiles() {
   return fileList;
 }
 
-const toFileList = async (array: string[]) => {
+const toFileList = async (array: string[]): Promise<SelectedFileList> => {
   return await Promise.all(
     array.map(async (file) => {
       return {

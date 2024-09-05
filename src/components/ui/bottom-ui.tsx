@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { handleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/ui";
 import { Icon } from "@iconify/react";
 import { useEffect, useRef } from "react";
 import {
@@ -95,9 +95,11 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
   useEffect(() => {
     async function handleDrag(event: MouseEvent) {
       if (event.target === event.currentTarget && event.buttons === 1) {
-        event.detail === 2
-          ? playPause()
-          : await getCurrentWindow().startDragging();
+        if (event.detail === 2) {
+          playPause();
+        } else if (!(await getCurrentWindow().isFullscreen())) {
+          await getCurrentWindow().startDragging();
+        }
       }
     }
 
@@ -116,12 +118,13 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
   return (
     <div
       ref={draggableRef2}
-      className="absolute bottom-0 z-20 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-500 ease-fast-out hover:opacity-100"
+      className="absolute bottom-0 z-20 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100"
     >
       <TooltipProvider delayDuration={200}>
         <Tooltip>
-          <TooltipTrigger>
+          <TooltipTrigger className="px-4">
             <Slider
+              className="py-2"
               max={1}
               step={0.00001}
               value={sliderValue}
@@ -130,7 +133,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
             />
           </TooltipTrigger>
           <TooltipContent
-            className="w-20 flex justify-center"
+            className="w-20 flex translate-y-2 justify-center"
             style={{
               position: "absolute",
               left: `${currentTooltipLeft}px`,
@@ -208,7 +211,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
             size="icon"
             variant={"icon"}
             className="bg-transparent rounded-full w-8 h-8"
-            onClick={handleFullscreen}
+            onClick={toggleFullscreen}
           >
             <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
           </Button>

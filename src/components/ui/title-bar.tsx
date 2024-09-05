@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { handleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/ui";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Minus, Square, X } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
@@ -16,9 +16,11 @@ function TitleBar() {
     const draggable = draggableRef.current;
     async function handleDrag(event: MouseEvent) {
       if (event.target === event.currentTarget && event.buttons === 1) {
-        event.detail === 2
-          ? playPause()
-          : await getCurrentWindow().startDragging();
+        if (event.detail === 2) {
+          playPause();
+        } else if (!appWindow.isFullscreen()) {
+          await getCurrentWindow().startDragging();
+        }
       }
     }
     draggable?.addEventListener("mousedown", handleDrag);
@@ -30,7 +32,7 @@ function TitleBar() {
 
   return (
     <div
-      className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${currentFileList.length > 0 ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-500 ease-fast-out hover:opacity-100`}
+      className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${currentFileList.length > 0 ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-700 ease-fast-out hover:opacity-100`}
     >
       <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50">
         {currentVideo?.name}{" "}
@@ -55,7 +57,7 @@ function TitleBar() {
           className="bg-transparent rounded-none w-7 h-7 p-2 hover:bg-neutral-400/20 relative z-50"
           onClick={async () =>
             (await appWindow.isFullscreen())
-              ? handleFullscreen()
+              ? toggleFullscreen()
               : appWindow.toggleMaximize()
           }
         >

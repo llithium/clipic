@@ -8,7 +8,7 @@ import {
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { handleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/ui";
 
 function AppContextMenu({ children }: { children: React.ReactNode }) {
   const {
@@ -38,7 +38,7 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
           Mute
           <ContextMenuShortcut>M</ContextMenuShortcut>
         </ContextMenuItem>
-        <ContextMenuItem onSelect={handleFullscreen} inset>
+        <ContextMenuItem onSelect={toggleFullscreen} inset>
           Fullscreen
           <ContextMenuShortcut>Enter</ContextMenuShortcut>
         </ContextMenuItem>

@@ -6,7 +6,7 @@ import * as path from "@tauri-apps/api/path";
 import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { handleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/ui";
 import {
   ResizableHandle,
   ResizablePanel,
@@ -101,7 +101,7 @@ function Index() {
 
       if (event.key === "Enter") {
         event.preventDefault();
-        handleFullscreen();
+        toggleFullscreen();
       }
 
       if (event.key === "ArrowUp") {
@@ -169,9 +169,11 @@ function Index() {
 
     async function handleDrag(event: MouseEvent) {
       if (event.target === event.currentTarget && event.buttons === 1) {
-        event.detail === 2
-          ? playPause()
-          : await getCurrentWindow().startDragging();
+        if (event.detail === 2) {
+          playPause();
+        } else if (!(await getCurrentWindow().isFullscreen())) {
+          await getCurrentWindow().startDragging();
+        }
       }
     }
     async function handleDragMain(event: MouseEvent) {
@@ -179,7 +181,7 @@ function Index() {
         if (event.target === event.currentTarget && event.buttons === 1) {
           if (event.detail === 2) {
             playPause();
-          } else {
+          } else if (!(await getCurrentWindow().isFullscreen())) {
             await getCurrentWindow().startDragging();
           }
         }
@@ -280,12 +282,13 @@ function Index() {
         </div>
       </ResizablePanel>
       <ResizableHandle
-        className={`relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8 ${!isSidePanelOpen && "hidden"}`}
+        className={` rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8 ${!isSidePanelOpen && "hidden"}`}
       />
       <ResizablePanel
         className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
-        minSize={10}
         defaultSize={20}
+        minSize={10}
+        maxSize={50}
       >
         <SidePanel />
       </ResizablePanel>
