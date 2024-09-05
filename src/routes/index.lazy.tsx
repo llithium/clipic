@@ -282,7 +282,7 @@ function Index() {
         </div>
       </ResizablePanel>
       <ResizableHandle
-        className={` rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-32px)] translate-y-8 ${!isSidePanelOpen && "hidden"}`}
+        className={`rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
       />
       <ResizablePanel
         className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
