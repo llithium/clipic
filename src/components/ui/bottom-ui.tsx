@@ -74,15 +74,14 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
     const { left, width } = sliderElement.getBoundingClientRect();
     const mouseX = event.clientX;
     const fraction = (mouseX - left) / width;
-    // const viewportWidth = window.innerWidth;
-    const sliderWidth = sliderElement.getBoundingClientRect().width;
+    const viewportWidth = window.innerWidth;
 
-    let tooltipLeft = mouseX - sliderWidth / 2 - tooltipWidth / 2;
+    let tooltipLeft = mouseX - viewportWidth / 2 - tooltipWidth / 2;
 
-    if (tooltipLeft < 0 - sliderWidth / 2) {
-      tooltipLeft = 0 - sliderWidth / 2;
-    } else if (tooltipLeft + tooltipWidth > sliderWidth / 2) {
-      tooltipLeft = sliderWidth / 2 - tooltipWidth;
+    if (tooltipLeft < 0 - viewportWidth / 2) {
+      tooltipLeft = 0 - viewportWidth / 2;
+    } else if (tooltipLeft + tooltipWidth > viewportWidth / 2) {
+      tooltipLeft = viewportWidth / 2 - tooltipWidth;
     }
 
     updateCurrentTooltipLeft(tooltipLeft);
