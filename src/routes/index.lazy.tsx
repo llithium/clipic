@@ -50,6 +50,7 @@ function Index() {
     toggleSidePanel,
     toggleMute,
     openFiles,
+    shortcutsDisabled,
   } = usePlayerStore();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -92,6 +93,9 @@ function Index() {
     });
 
     function handleKeyDown(event: KeyboardEvent) {
+      if (shortcutsDisabled) {
+        return;
+      }
       console.log(event.code);
 
       if (event.code === "Space" || event.key === "k") {
@@ -185,7 +189,7 @@ function Index() {
             await getCurrentWindow().startDragging();
           }
         }
-      } else if (event.button === 0) {
+      } else if (event.button === 0 && !currentVideo) {
         openFiles();
       }
     }
@@ -224,6 +228,8 @@ function Index() {
     nextVideo,
     currentFileList,
     toggleSidePanel,
+    shortcutsDisabled,
+    currentVideo,
   ]);
 
   useEffect(() => {

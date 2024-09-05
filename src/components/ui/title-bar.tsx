@@ -18,7 +18,7 @@ function TitleBar() {
       if (event.target === event.currentTarget && event.buttons === 1) {
         if (event.detail === 2) {
           playPause();
-        } else if (!appWindow.isFullscreen()) {
+        } else if (!(await appWindow.isFullscreen())) {
           await getCurrentWindow().startDragging();
         }
       }

@@ -26,6 +26,7 @@ type State = {
   isMuted: boolean;
   currentTooltipLeft: number;
   isSidePanelOpen: boolean;
+  shortcutsDisabled: boolean;
 };
 type Actions = {
   updateCurrentFileList: (state: SelectedFileList) => void;
@@ -39,6 +40,8 @@ type Actions = {
   updateCurrentVolume: (state: number) => void;
   updateIsMuted: (state: boolean) => void;
   updateCurrentTooltipLeft: (state: number) => void;
+  updateShortcutsDisabled: (state: boolean) => void;
+
   playPause: () => void;
   nextVideo: () => void;
   previousVideo: () => void;
@@ -47,6 +50,7 @@ type Actions = {
   toggleSidePanel: () => void;
   toggleMute: () => void;
   openFiles: () => void;
+  openDirectory: () => void;
 };
 
 const volumeStep = 0.05;
@@ -64,6 +68,7 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   isMuted: false,
   currentTooltipLeft: 0,
   isSidePanelOpen: false,
+  shortcutsDisabled: false,
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
   updateCurrentIndex: (state) => set({ currentIndex: state }),
@@ -75,6 +80,8 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   updateCurrentVolume: (state) => set({ currentVolume: state }),
   updateIsMuted: (state) => set({ isMuted: state }),
   updateCurrentTooltipLeft: (state) => set({ currentTooltipLeft: state }),
+  updateShortcutsDisabled: (state) => set({ shortcutsDisabled: state }),
+
   playPause: () => set((state) => ({ isPlaying: !state.isPlaying })),
   nextVideo: () =>
     set((state) => ({
@@ -113,6 +120,12 @@ export const usePlayerStore = create<State & Actions>((set) => ({
     }),
   openFiles: async () => {
     const fileList: SelectedFileList = await getFiles();
+    if (fileList.length > 0) {
+      set({ currentFileList: fileList });
+    }
+  },
+  openDirectory: async () => {
+    const fileList: SelectedFileList = await getFiles(true);
     if (fileList.length > 0) {
       set({ currentFileList: fileList });
     }
