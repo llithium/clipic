@@ -1,7 +1,7 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use std::{ffi::OsString, path::PathBuf};
+use std::{ffi::OsString, fs::read_dir, path::PathBuf};
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct File {
@@ -19,17 +19,26 @@ fn main() {
 
 #[tauri::command]
 async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>, ()> {
-    let file_list = directories
-        .iter()
-        .flat_map(|dir| dir.read_dir().unwrap())
-        .map(|entry| {
-            let entry = entry.unwrap();
-            File {
+    let mut file_list = vec![];
+    for dir in directories {
+        let entries = if let Ok(entries) = read_dir(dir) {
+            entries
+        } else {
+            return Err(());
+        };
+        for entry in entries {
+            let entry = if let Ok(entry) = entry {
+                entry
+            } else {
+                return Err(());
+            };
+            let file = File {
                 file_name: entry.file_name().into_string().unwrap_or_default(),
                 file_path: entry.path(),
                 file_extension: entry.path().extension().unwrap_or_default().to_owned(),
-            }
-        })
-        .collect();
+            };
+            file_list.push(file)
+        }
+    }
     Ok(file_list)
 }

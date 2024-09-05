@@ -115,7 +115,7 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
               <Label htmlFor="url" className="sr-only">
                 URL
               </Label>
-              <Input type="text" id="url" />
+              <Input type="url" id="url" />
             </div>
             <Button type="submit" size="sm">
               Load
