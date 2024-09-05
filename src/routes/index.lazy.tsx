@@ -189,7 +189,7 @@ function Index() {
             await getCurrentWindow().startDragging();
           }
         }
-      } else if (event.button === 0 && !currentVideo) {
+      } else if (event.button === 0 && !currentVideo?.name) {
         openFiles();
       }
     }

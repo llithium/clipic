@@ -2,6 +2,11 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
 use std::{ffi::OsString, fs::read_dir, path::PathBuf};
+
+const EXTENSIONS: [&str; 9] = [
+    "mp4", "avi", "mkv", "mov", "flv", "webm", "wmv", "mpeg", "m4v",
+];
+
 #[derive(Debug, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 struct File {
@@ -32,6 +37,18 @@ async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>,
             } else {
                 return Err(());
             };
+
+            if !EXTENSIONS.contains(
+                &entry
+                    .path()
+                    .extension()
+                    .unwrap_or_default()
+                    .to_str()
+                    .unwrap_or_default(),
+            ) {
+                break;
+            };
+
             let file = File {
                 file_name: entry.file_name().into_string().unwrap_or_default(),
                 file_path: entry.path(),

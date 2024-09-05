@@ -35,6 +35,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
     sliderValue,
     updateCurrentTooltipLeft,
     updateHoveredTime,
+    currentVideo,
   } = usePlayerStore();
 
   function handleSeek(value: number[]) {
@@ -117,7 +118,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
   return (
     <div
       ref={draggableRef2}
-      className="absolute bottom-0 z-20 pb-2 pt-32 flex flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100"
+      className={`absolute bottom-0 z-20 pb-2 pt-32 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100 ${!currentVideo?.name ? "hidden" : "flex"}`}
     >
       <TooltipProvider delayDuration={200}>
         <Tooltip>

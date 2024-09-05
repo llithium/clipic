@@ -18,7 +18,6 @@ export async function getFiles(directory?: boolean): Promise<SelectedFileList> {
             "webm",
             "wmv",
             "mpeg",
-            "mkv",
             "m4v",
           ],
         },
