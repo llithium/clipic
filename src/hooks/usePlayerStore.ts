@@ -27,6 +27,8 @@ type State = {
   currentTooltipLeft: number;
   isSidePanelOpen: boolean;
   shortcutsDisabled: boolean;
+  isSettingsOpen: boolean;
+  isVideoHidden: boolean;
 };
 type Actions = {
   updateCurrentFileList: (state: SelectedFileList) => void;
@@ -51,6 +53,8 @@ type Actions = {
   toggleMute: () => void;
   openFiles: () => void;
   openDirectory: () => void;
+  toggleSettings: () => void;
+  toggleVideoHidden: () => void;
 };
 
 const volumeStep = 0.05;
@@ -69,6 +73,9 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   currentTooltipLeft: 0,
   isSidePanelOpen: false,
   shortcutsDisabled: false,
+  isSettingsOpen: false,
+  isVideoHidden: false,
+
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
   updateCurrentIndex: (state) => set({ currentIndex: state }),
@@ -130,4 +137,11 @@ export const usePlayerStore = create<State & Actions>((set) => ({
       set({ currentFileList: fileList });
     }
   },
+  toggleSettings: () =>
+    set((state) => ({
+      isSettingsOpen: !state.isSettingsOpen,
+      isVideoHidden: !state.isVideoHidden,
+    })),
+  toggleVideoHidden: () =>
+    set((state) => ({ isVideoHidden: !state.isVideoHidden })),
 }));

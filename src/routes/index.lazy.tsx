@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/resizable";
 import BottomUI from "@/components/ui/bottom-ui";
 import SidePanel from "@/components/ui/side-panel";
+import Settings from "@/components/ui/settings";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -51,6 +52,9 @@ function Index() {
     toggleMute,
     openFiles,
     shortcutsDisabled,
+    toggleSettings,
+    isSettingsOpen,
+    isVideoHidden,
   } = usePlayerStore();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -151,6 +155,11 @@ function Index() {
       if (event.ctrlKey && event.key == "s") {
         event.preventDefault();
         toggleSidePanel();
+      }
+
+      if (event.ctrlKey && event.key == "p") {
+        event.preventDefault();
+        toggleSettings();
       }
     }
 
@@ -258,7 +267,7 @@ function Index() {
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel>
-        <div className="w-full h-full">
+        <div className={`w-full h-full ${isVideoHidden && "hidden"}`}>
           <div
             ref={draggableRef}
             className={`relative w-full h-full z-10 select-none`}
@@ -270,7 +279,7 @@ function Index() {
               width={"100%"}
               height={"100%"}
               muted={isMuted}
-              playing={isPlaying}
+              playing={isVideoHidden ? false : isPlaying}
               volume={currentVolume}
               progressInterval={50}
               onDuration={(duration) => updateVideoDuration(duration)}
@@ -290,14 +299,17 @@ function Index() {
       <ResizableHandle
         className={`rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
       />
-      <ResizablePanel
-        className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
-        defaultSize={20}
-        minSize={10}
-        maxSize={50}
-      >
-        <SidePanel />
-      </ResizablePanel>
+      {isSettingsOpen && <Settings />}
+      {isVideoHidden && (
+        <ResizablePanel
+          className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
+          defaultSize={20}
+          minSize={10}
+          maxSize={50}
+        >
+          <SidePanel />
+        </ResizablePanel>
+      )}
     </ResizablePanelGroup>
   );
 }

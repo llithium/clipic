@@ -37,6 +37,7 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
     openDirectory,
     updateCurrentVideo,
     updateShortcutsDisabled,
+    toggleSettings,
   } = usePlayerStore();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -92,6 +93,10 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
             <ContextMenuShortcut>Ctrl+S</ContextMenuShortcut>
           </ContextMenuCheckboxItem>
           {/* <ContextMenuSeparator /> */}
+          <ContextMenuItem onSelect={toggleSettings} inset>
+            Open Settings
+            <ContextMenuShortcut>Ctrl+P</ContextMenuShortcut>
+          </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
       <DialogContent className="sm:max-w-md">

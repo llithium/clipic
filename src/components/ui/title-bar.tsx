@@ -8,8 +8,13 @@ import { useEffect, useRef } from "react";
 const appWindow = getCurrentWebviewWindow();
 
 function TitleBar() {
-  const { playPause, currentVideo, currentIndex, currentFileList } =
-    usePlayerStore();
+  const {
+    playPause,
+    currentVideo,
+    currentIndex,
+    currentFileList,
+    isVideoHidden,
+  } = usePlayerStore();
   const draggableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -32,16 +37,18 @@ function TitleBar() {
 
   return (
     <div
-      className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${currentFileList.length > 0 ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-700 ease-fast-out hover:opacity-100`}
+      className={`absolute top-0 select-none w-full z-40 h-fit pt-2 bg-gradient-to-b from-black/30 ${isVideoHidden ? "bg-inherit h-[32px]" : currentFileList.length > 0 ? "opacity-0" : "bg-inherit h-[32px]"} transition-opacity duration-700 ease-fast-out hover:opacity-100`}
     >
-      <h1 className="scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50">
+      <h1
+        className={`scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${isVideoHidden && "hidden"}`}
+      >
         {currentVideo?.name}{" "}
         {currentFileList.length > 1 &&
           `[${currentIndex + 1}/${currentFileList.length}]`}
       </h1>
       <div
         ref={draggableRef}
-        className={`absolute flex top-0 justify-end w-full items-center ${currentFileList.length > 0 ? "pb-32" : null}`}
+        className={`absolute flex top-0 justify-end w-full items-center ${isVideoHidden ? null : currentFileList.length > 0 ? "pb-32" : null}`}
       >
         <Button
           size="icon"
