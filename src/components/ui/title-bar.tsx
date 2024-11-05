@@ -14,6 +14,7 @@ function TitleBar() {
     currentIndex,
     currentFileList,
     isVideoHidden,
+    isSettingsOpen,
   } = usePlayerStore();
   const draggableRef = useRef<HTMLDivElement>(null);
 
@@ -45,6 +46,11 @@ function TitleBar() {
         {currentVideo?.name}{" "}
         {currentFileList.length > 1 &&
           `[${currentIndex + 1}/${currentFileList.length}]`}
+      </h1>
+      <h1
+        className={`scroll-m-20 text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${!isSettingsOpen && "hidden"}`}
+      >
+        Settings
       </h1>
       <div
         ref={draggableRef}

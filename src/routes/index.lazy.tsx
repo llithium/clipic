@@ -300,7 +300,7 @@ function Index() {
         className={`rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
       />
       {isSettingsOpen && <Settings />}
-      {isVideoHidden && (
+      {!isVideoHidden && (
         <ResizablePanel
           className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
           defaultSize={20}

@@ -128,13 +128,21 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   openFiles: async () => {
     const fileList: SelectedFileList = await getFiles();
     if (fileList.length > 0) {
-      set({ currentFileList: fileList });
+      set({
+        currentFileList: fileList,
+        isSettingsOpen: false,
+        isVideoHidden: false,
+      });
     }
   },
   openDirectory: async () => {
     const fileList: SelectedFileList = await getFiles(true);
     if (fileList.length > 0) {
-      set({ currentFileList: fileList });
+      set({
+        currentFileList: fileList,
+        isSettingsOpen: false,
+        isVideoHidden: false,
+      });
     }
   },
   toggleSettings: () =>
