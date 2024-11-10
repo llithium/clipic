@@ -297,7 +297,7 @@ function Index() {
         </div>
       </ResizablePanel>
       <ResizableHandle
-        className={`rounded-tl-lg relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
+        className={`rounded-tl-lg bg-border/50 relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
       />
       {isSettingsOpen && <Settings />}
       {!isVideoHidden && (

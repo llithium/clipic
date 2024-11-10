@@ -22,7 +22,7 @@ const formSchema = z.object({
 });
 
 function Settings() {
-  const { setTheme } = useTheme();
+  const { theme,setTheme } = useTheme();
   const { toggleSettings } = usePlayerStore();
 
   // 1. Define your form.
@@ -79,6 +79,7 @@ function Settings() {
                       </div>
                       <FormControl>
                         <Switch
+                        defaultChecked={theme === "dark" ? true : false}
                           checked={field.value}
                           onCheckedChange={field.onChange}
                         />
