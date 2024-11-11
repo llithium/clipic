@@ -242,10 +242,6 @@ function Index() {
   ]);
 
   useEffect(() => {
-    updateCurrentIndex(0);
-  }, [currentFileList, updateCurrentIndex]);
-
-  useEffect(() => {
     currentFileList &&
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
@@ -261,7 +257,6 @@ function Index() {
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
         extension: currentFileList[currentIndex]?.fileExtension,
       });
-    updateIsPlaying(true);
   }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
 
   return (

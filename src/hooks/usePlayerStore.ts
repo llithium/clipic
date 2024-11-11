@@ -132,6 +132,8 @@ export const usePlayerStore = create<State & Actions>((set) => ({
         currentFileList: fileList,
         isSettingsOpen: false,
         isVideoHidden: false,
+        isPlaying: true,
+        currentIndex:0
       });
     }
   },
@@ -142,6 +144,8 @@ export const usePlayerStore = create<State & Actions>((set) => ({
         currentFileList: fileList,
         isSettingsOpen: false,
         isVideoHidden: false,
+        isPlaying: true,
+        currentIndex:0
       });
     }
   },

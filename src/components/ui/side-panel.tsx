@@ -17,6 +17,7 @@ function SidePanel() {
       if (!result.destination) {
         return;
       }
+      const currentVideoId = currentFileList[currentIndex].fileName;
 
       const updatedFileList: SelectedFileList = reorder(
         currentFileList,
@@ -24,8 +25,12 @@ function SidePanel() {
         result.destination.index
       );
       updateCurrentFileList(updatedFileList);
+      const newIndex = updatedFileList.findIndex(
+        (video) => video.fileName === currentVideoId
+      );
+      updateCurrentIndex(newIndex);
     },
-    [currentFileList, updateCurrentFileList]
+    [currentFileList, currentIndex, updateCurrentFileList, updateCurrentIndex]
   );
   const reorder = (
     list: SelectedFileList,
@@ -43,11 +48,7 @@ function SidePanel() {
       <ScrollArea className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 flex flex-col gap-1 overflow-y-auto">
         <Droppable droppableId="droppable-1">
           {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              // style={getListStyle(snapshot.isDraggingOver)}
-            >
+            <div {...provided.droppableProps} ref={provided.innerRef}>
               {currentFileList.map((video, i) => (
                 <Draggable
                   key={`${video.fileName}-${i}`}
