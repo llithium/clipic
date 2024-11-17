@@ -38,6 +38,8 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
     updateCurrentVideo,
     updateShortcutsDisabled,
     toggleSettings,
+    loop,
+    toggleLoop,
   } = usePlayerStore();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -68,6 +70,9 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
             Mute
             <ContextMenuShortcut>M</ContextMenuShortcut>
           </ContextMenuItem>
+          <ContextMenuCheckboxItem onSelect={toggleLoop} checked={loop}>
+            Loop
+          </ContextMenuCheckboxItem>
           <ContextMenuItem onSelect={toggleFullscreen} inset>
             Fullscreen
             <ContextMenuShortcut>Enter</ContextMenuShortcut>

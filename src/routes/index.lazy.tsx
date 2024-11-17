@@ -55,6 +55,7 @@ function Index() {
     toggleSettings,
     isSettingsOpen,
     isVideoHidden,
+    loop,
   } = usePlayerStore();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -239,6 +240,7 @@ function Index() {
     toggleSidePanel,
     shortcutsDisabled,
     currentVideo,
+    toggleSettings,
   ]);
 
   useEffect(() => {
@@ -283,6 +285,7 @@ function Index() {
               }}
               onEnded={nextVideo}
               url={currentVideo?.url}
+              loop={loop}
             ></ReactPlayer>
             <div
               ref={draggableRef2}

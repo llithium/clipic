@@ -61,7 +61,7 @@ function SidePanel() {
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       className={`hover:opacity-80 cursor-pointer active:opacity-60 transition-all px-2 py-1 ${
-                        currentIndex === i && "bg-border/50"
+                        currentIndex === i && "bg-border/70"
                       }`}
                       onClick={() => updateCurrentIndex(i)}
                     >
