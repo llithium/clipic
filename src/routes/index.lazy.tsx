@@ -56,6 +56,7 @@ function Index() {
     isSettingsOpen,
     isVideoHidden,
     loop,
+    toggleLoop,
   } = usePlayerStore();
 
   const videoRef = useRef<ReactPlayer>(null);
@@ -250,16 +251,15 @@ function Index() {
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
         extension: currentFileList[currentIndex]?.fileExtension,
       });
-  }, [currentFileList, currentIndex, updateCurrentIndex, updateCurrentVideo]);
 
-  useEffect(() => {
-    currentFileList &&
-      updateCurrentVideo({
-        name: currentFileList[currentIndex]?.fileName,
-        url: convertFileSrc(currentFileList[currentIndex]?.filePath),
-        extension: currentFileList[currentIndex]?.fileExtension,
-      });
-  }, [currentFileList, currentIndex, updateCurrentVideo, updateIsPlaying]);
+    if (currentFileList.length === 1 && videoDuration <= 15) {
+      console.log(!loop);
+
+      !loop && toggleLoop();
+    } else if (loop) {
+      toggleLoop();
+    }
+  }, [currentFileList, currentIndex, loop, toggleLoop, updateCurrentIndex, updateCurrentVideo, updateIsPlaying, videoDuration]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
