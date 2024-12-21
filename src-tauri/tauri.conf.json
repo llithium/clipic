@@ -42,7 +42,7 @@
   },
   "productName": "Clipic",
   "version": "0.1.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.clipic.dev",
   "plugins": {},
   "app": {
     "windows": [
@@ -60,7 +60,12 @@
         "scope": ["**"],
         "enable": true
       },
-      "csp": "default-src 'self'; img-src 'self' asset: https://asset.localhost; connect-src ipc: http://ipc.localhost"
+      "csp": {
+        "default-src": "'self' asset: http://asset.localhost",
+        "connect-src": "ipc: http://ipc.localhost https://api.iconify.design https://api.simplesvg.com https://api.unisvg.com",
+        "img-src": "'self' asset: http://asset.localhost blob: data:",
+        "style-src": "'unsafe-inline' 'self'"
+      }
     }
   }
 }

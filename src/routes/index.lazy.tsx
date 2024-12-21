@@ -245,6 +245,7 @@ function Index() {
   ]);
 
   useEffect(() => {
+    
     currentFileList &&
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
@@ -253,13 +254,20 @@ function Index() {
       });
 
     if (currentFileList.length === 1 && videoDuration <= 15) {
-      console.log(!loop);
-
       !loop && toggleLoop();
     } else if (loop) {
       toggleLoop();
     }
-  }, [currentFileList, currentIndex, loop, toggleLoop, updateCurrentIndex, updateCurrentVideo, updateIsPlaying, videoDuration]);
+  }, [
+    currentFileList,
+    currentIndex,
+    loop,
+    toggleLoop,
+    updateCurrentIndex,
+    updateCurrentVideo,
+    updateIsPlaying,
+    videoDuration,
+  ]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
