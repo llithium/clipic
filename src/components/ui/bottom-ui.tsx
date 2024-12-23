@@ -12,6 +12,7 @@ import {
 import ReactPlayer from "react-player";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Slider } from "./slider";
+import { useSettingsStore } from "@/hooks/useSettingsStore";
 
 const tooltipWidth = 80;
 
@@ -37,7 +38,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
     updateHoveredTime,
     currentVideo,
   } = usePlayerStore();
-
+  const { windowMovement } = useSettingsStore();
   function handleSeek(value: number[]) {
     video?.seekTo(value[0], "fraction");
   }
@@ -94,11 +95,13 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
 
   useEffect(() => {
     async function handleDrag(event: MouseEvent) {
-      if (event.target === event.currentTarget && event.buttons === 1) {
-        if (event.detail === 2) {
-          playPause();
-        } else if (!(await getCurrentWindow().isFullscreen())) {
-          await getCurrentWindow().startDragging();
+      if (windowMovement === "anywhere") {
+        if (event.target === event.currentTarget && event.buttons === 1) {
+          if (event.detail === 2) {
+            playPause();
+          } else if (!(await getCurrentWindow().isFullscreen())) {
+            await getCurrentWindow().startDragging();
+          }
         }
       }
     }

@@ -15,6 +15,7 @@ import {
 import BottomUI from "@/components/ui/bottom-ui";
 import SidePanel from "@/components/ui/side-panel";
 import Settings from "@/components/ui/settings";
+import { useSettingsStore } from "@/hooks/useSettingsStore";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -58,6 +59,7 @@ function Index() {
     loop,
     toggleLoop,
   } = usePlayerStore();
+  const { windowMovement } = useSettingsStore();
 
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
@@ -183,16 +185,7 @@ function Index() {
     }
 
     async function handleDrag(event: MouseEvent) {
-      if (event.target === event.currentTarget && event.buttons === 1) {
-        if (event.detail === 2) {
-          playPause();
-        } else if (!(await getCurrentWindow().isFullscreen())) {
-          await getCurrentWindow().startDragging();
-        }
-      }
-    }
-    async function handleDragMain(event: MouseEvent) {
-      if (currentFileList.length > 0) {
+      if (windowMovement === "anywhere") {
         if (event.target === event.currentTarget && event.buttons === 1) {
           if (event.detail === 2) {
             playPause();
@@ -200,8 +193,29 @@ function Index() {
             await getCurrentWindow().startDragging();
           }
         }
-      } else if (event.button === 0 && !currentVideo?.name) {
-        openFiles();
+      }
+    }
+    async function handleDragMain(event: MouseEvent) {
+      if (windowMovement === "anywhere") {
+        if (currentFileList.length > 0) {
+          if (event.target === event.currentTarget && event.buttons === 1) {
+            if (event.detail === 2) {
+              playPause();
+            } else if (!(await getCurrentWindow().isFullscreen())) {
+              await getCurrentWindow().startDragging();
+            }
+          }
+        } else if (event.button === 0 && !currentVideo?.name) {
+          openFiles();
+        }
+      } else {
+        if (currentFileList.length > 0) {
+          if (event.buttons === 1) {
+            playPause();
+          }
+        } else if (event.button === 0 && !currentVideo?.name) {
+          openFiles();
+        }
       }
     }
     const draggable = draggableRef.current;
@@ -245,7 +259,6 @@ function Index() {
   ]);
 
   useEffect(() => {
-    
     currentFileList &&
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
@@ -297,7 +310,7 @@ function Index() {
             ></ReactPlayer>
             <div
               ref={draggableRef2}
-              className={`relative w-full h-full z-10 select-none`}
+              className={`relative w-full h-full z-10 select-none ${currentFileList.length === 0 && "cursor-pointer"}`}
             ></div>
           </div>
         </div>
