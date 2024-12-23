@@ -5,7 +5,6 @@ import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Minus, Square, X } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { useEffect, useRef } from "react";
-import { useSettingsStore } from "@/hooks/useSettingsStore";
 const appWindow = getCurrentWebviewWindow();
 
 function TitleBar() {
@@ -17,7 +16,6 @@ function TitleBar() {
     isVideoHidden,
     isSettingsOpen,
   } = usePlayerStore();
-  const { windowMovement } = useSettingsStore();
   const draggableRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {

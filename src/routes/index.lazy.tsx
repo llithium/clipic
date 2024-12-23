@@ -210,7 +210,8 @@ function Index() {
         }
       } else {
         if (currentFileList.length > 0) {
-          if (event.buttons === 1) {
+          const target = event.target as HTMLDivElement;
+          if (target.id === "draggableRef2" && event.buttons === 1) {
             playPause();
           }
         } else if (event.button === 0 && !currentVideo?.name) {
@@ -309,6 +310,7 @@ function Index() {
               loop={loop}
             ></ReactPlayer>
             <div
+              id="draggableRef2"
               ref={draggableRef2}
               className={`relative w-full h-full z-10 select-none ${currentFileList.length === 0 && "cursor-pointer"}`}
             ></div>
