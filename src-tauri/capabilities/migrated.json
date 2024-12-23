@@ -2,7 +2,9 @@
   "identifier": "migrated",
   "description": "permissions that were migrated from v1",
   "local": true,
-  "windows": ["main"],
+  "windows": [
+    "main"
+  ],
   "permissions": [
     "core:default",
     "fs:allow-read-file",
@@ -11,7 +13,9 @@
     "dialog:allow-open",
     {
       "identifier": "fs:scope",
-      "allow": ["**"]
+      "allow": [
+        "**"
+      ]
     },
     "core:window:allow-create",
     "core:window:allow-center",
@@ -47,6 +51,7 @@
     "core:window:allow-start-dragging",
     "core:webview:allow-print",
     "core:window:allow-toggle-maximize",
-    "core:window:allow-internal-toggle-maximize"
+    "core:window:allow-internal-toggle-maximize",
+    "store:default"
   ]
 }

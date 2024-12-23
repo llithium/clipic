@@ -5,40 +5,52 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
+  // FormDescription,
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
   // FormMessage,
 } from "@/components/ui/form";
-// import { Input } from "@/components/ui/input";
-import { Switch } from "./switch";
 import { useTheme } from "../providers/theme-provider";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
 import { MoveLeft } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Theme } from "@tauri-apps/api/window";
+import { useSettingsStore } from "@/hooks/useSettingsStore";
+
 const formSchema = z.object({
-  // username: z.string().min(2).max(50),
-  theme: z.boolean().default(true).optional(),
+  theme: z.string(),
+  windowMovement: z.string(),
 });
 
 function Settings() {
-  const { theme,setTheme } = useTheme();
+  const { theme, setTheme } = useTheme();
   const { toggleSettings } = usePlayerStore();
+  const { windowMovement, updateWindowMovement } = useSettingsStore();
+  console.log(windowMovement);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    // defaultValues: {
-    //   username: "",
-    // },
+    defaultValues: {
+      theme: theme,
+      windowMovement: windowMovement,
+    },
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
-    console.log(values);
-    values.theme === true ? setTheme("dark") : setTheme("light");
+    setTheme(values.theme as Theme);
+    updateWindowMovement(values.windowMovement);
   }
 
   return (
@@ -48,48 +60,66 @@ function Settings() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="w-full space-y-6"
         >
-          <div className="grid grid-rows-2 pt-6 grid-cols-2 gap-4">
-            {/* <FormField
+          <section className="w-1/2 flex flex-col pt-4">
+            <FormField
               control={form.control}
-              name="username"
+              name="theme"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Username</FormLabel>
-                  <FormControl>
-                    <Input placeholder="shadcn" {...field} />
-                  </FormControl>
-                  <FormDescription>
-                    This is your public display name.
-                  </FormDescription>
+                  <FormLabel>Theme</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select theme" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="system">System</SelectItem>
+                      <SelectItem value="dark">Dark</SelectItem>
+                      <SelectItem value="light">Light</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {/* <FormDescription>
+                </FormDescription> */}
                   <FormMessage />
                 </FormItem>
               )}
-            /> */}
-            <div>
-              {/* <h3 className="mb-4 text-lg font-medium">Email Notifications</h3> */}
-              <div className="space-y-4">
-                <FormField
-                  control={form.control}
-                  name="theme"
-                  render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
-                      <div className="space-y-0.5">
-                        <FormLabel className="text-base">Dark Mode</FormLabel>
-                        <FormDescription>Select theme</FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                        defaultChecked={theme === "dark" ? true : false}
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </div>
-            </div>
-          </div>
+            />
+            <FormField
+              control={form.control}
+              name="windowMovement"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Window Movement</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select method for moving the window" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="titleBar">Title bar only</SelectItem>
+                      <SelectItem value="anywhere">
+                        {
+                          "Click and drag anywhere (double-click for play/pause)"
+                        }
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  {/* <FormDescription>
+                </FormDescription> */}
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </section>
+          {/* <section className="w-1/2 flex flex-col pt-4"></section> */}
 
           <div className="flex w-full justify-between">
             <Button variant={"ghost"} onClick={toggleSettings}>
