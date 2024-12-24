@@ -1,4 +1,5 @@
 import { getFiles } from "@/lib/files";
+import { load } from "@tauri-apps/plugin-store";
 import { create } from "zustand";
 
 export type SelectedFileList = SelectedFile[];
@@ -60,8 +61,11 @@ type Actions = {
 };
 
 const volumeStep = 0.05;
+const store = await load("store.json", { autoSave: false });
+const volume: number = (await store.get("volume")) || 0.5;
+const sidePanel: boolean = (await store.get("side-panel")) || false;
 
-export const usePlayerStore = create<State & Actions>((set) => ({
+export const usePlayerStore = create<State & Actions>((set, get) => ({
   currentFileList: [],
   currentVideo: undefined,
   currentIndex: 0,
@@ -70,10 +74,10 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   hoveredTime: "0",
   playedSeconds: 0,
   videoDuration: 0,
-  currentVolume: 0.5,
+  currentVolume: volume,
   isMuted: false,
   currentTooltipLeft: 0,
-  isSidePanelOpen: false,
+  isSidePanelOpen: sidePanel,
   shortcutsDisabled: false,
   isSettingsOpen: false,
   isVideoHidden: false,
@@ -87,7 +91,11 @@ export const usePlayerStore = create<State & Actions>((set) => ({
   updateHoveredTime: (state) => set({ hoveredTime: state }),
   updatePlayedSeconds: (state) => set({ playedSeconds: state }),
   updateVideoDuration: (state) => set({ videoDuration: state }),
-  updateCurrentVolume: (state) => set({ currentVolume: state }),
+  updateCurrentVolume: async (state) => {
+    set({ currentVolume: state });
+    await store.set("volume", state);
+    await store.save();
+  },
   updateIsMuted: (state) => set({ isMuted: state }),
   updateCurrentTooltipLeft: (state) => set({ currentTooltipLeft: state }),
   updateShortcutsDisabled: (state) => set({ shortcutsDisabled: state }),
@@ -104,21 +112,30 @@ export const usePlayerStore = create<State & Actions>((set) => ({
     set((state) => ({
       currentIndex: Math.max(state.currentIndex - 1, 0),
     })),
-  increaseVolumeByStep: () =>
+  increaseVolumeByStep: async () => {
     set((state) => ({
       currentVolume: Math.min(state.currentVolume + volumeStep, 1),
       isMuted: false,
-    })),
-  decreaseVolumeByStep: () =>
+    }));
+    await store.set("volume", get().currentVolume);
+    await store.save();
+  },
+  decreaseVolumeByStep: async () => {
     set((state) => {
       if (state.currentVolume >= volumeStep) {
         return { currentVolume: state.currentVolume - volumeStep };
       } else {
         return { currentVolume: 0, isMuted: true };
       }
-    }),
-  toggleSidePanel: () =>
-    set((state) => ({ isSidePanelOpen: !state.isSidePanelOpen })),
+    });
+    await store.set("volume", get().currentVolume);
+    await store.save();
+  },
+  toggleSidePanel: async () => {
+    set((state) => ({ isSidePanelOpen: !state.isSidePanelOpen }));
+    await store.set("side-panel", get().isSidePanelOpen);
+    await store.save();
+  },
   toggleMute: () =>
     set((state) => {
       if (state.isMuted && state.currentVolume === 0) {

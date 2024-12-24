@@ -8,7 +8,7 @@ type Actions = {
   updateWindowMovement: (state: string) => void;
 };
 
-const store = await load("store.json", { autoSave: false });
+const store = await load("store.json");
 const windowMovement: string =
   (await store.get("window-movement")) || "titleBar";
 
