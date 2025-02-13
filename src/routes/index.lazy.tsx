@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
-import { convertFileSrc } from "@tauri-apps/api/core";
+import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
 import * as path from "@tauri-apps/api/path";
 import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
@@ -85,6 +85,16 @@ function Index() {
     updateSliderValue([progress.played]);
     updatePlayedSeconds(progress.playedSeconds);
   }
+  useEffect(() => {
+    async function get_opened_file_args() {
+      const files: SelectedFileList = await invoke("get_opened_file_args");
+      if (files) {
+        updateCurrentFileList(files);
+      }
+    }
+    get_opened_file_args();
+  }, []);
+
   useEffect(() => {
     if (currentFileList.length === 1 && videoDuration <= 15) {
       !loop && toggleLoop();
