@@ -4,7 +4,7 @@ import { createRootRoute, Outlet } from "@tanstack/react-router";
 
 const __root = () => {
   return (
-    <main className="dark:bg-black select-none">
+    <main className="select-none">
       <AppContextMenu>
         <TitleBar />
         <Outlet />

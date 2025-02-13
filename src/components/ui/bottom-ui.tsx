@@ -76,7 +76,7 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
     const { left, width } = sliderElement.getBoundingClientRect();
     const mouseX = event.clientX;
     const fraction = (mouseX - left) / width;
-    const viewportWidth = window.innerWidth;
+    const viewportWidth = sliderElement.offsetWidth + 28;
 
     let tooltipLeft = mouseX - viewportWidth / 2 - tooltipWidth / 2;
 
