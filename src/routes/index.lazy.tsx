@@ -12,7 +12,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import BottomUI from "@/components/ui/bottom-ui";
+import PlayerControls from "@/components/ui/player-controls";
 import SidePanel from "@/components/ui/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
@@ -291,7 +291,7 @@ function Index() {
             ref={draggableRef}
             className={`relative w-full h-full z-10 select-none`}
           >
-            <BottomUI video={video} />
+            <PlayerControls video={video} />
             <ReactPlayer
               ref={videoRef}
               style={{ position: "absolute" }}

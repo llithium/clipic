@@ -70,3 +70,10 @@ svg {
     @apply bg-background text-foreground;
   }
 }
+
+body {
+  overflow: hidden;
+  position: fixed;
+  width: 100vw;
+  height: 100vh;
+}

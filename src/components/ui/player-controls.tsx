@@ -16,7 +16,7 @@ import { useSettingsStore } from "@/hooks/useSettingsStore";
 
 const tooltipWidth = 80;
 
-function BottomUI({ video }: { video: ReactPlayer | null }) {
+function PlayerControls({ video }: { video: ReactPlayer | null }) {
   const {
     currentFileList,
     currentIndex,
@@ -224,4 +224,4 @@ function BottomUI({ video }: { video: ReactPlayer | null }) {
   );
 }
 
-export default BottomUI;
+export default PlayerControls;
