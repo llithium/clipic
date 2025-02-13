@@ -18,7 +18,7 @@ struct File {
 }
 
 struct AppData {
-    opened_file_args: Vec<File>,
+    opened_file_args: Option<Vec<File>>,
 }
 
 fn main() {
@@ -46,10 +46,11 @@ fn main() {
                     file_extension: file_path.extension().unwrap_or_default().to_owned(),
                 };
                 file_list.push(file);
+                app.manage(AppData {
+                    opened_file_args: Some(file_list),
+                });
             }
-            app.manage(AppData {
-                opened_file_args: file_list,
-            });
+
             Ok(())
         })
         .run(tauri::generate_context!())
@@ -95,8 +96,7 @@ async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>,
 }
 
 #[tauri::command]
-async fn get_opened_file_args(app: AppHandle) -> Result<Vec<File>, ()> {
+async fn get_opened_file_args(app: AppHandle) -> Option<Vec<File>> {
     let data = app.state::<AppData>();
-    let opened_file_args = &data.opened_file_args;
-    Ok(opened_file_args.to_vec())
+    data.opened_file_args.as_ref().map(|files| files.to_vec())
 }
