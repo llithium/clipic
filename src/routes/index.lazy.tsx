@@ -16,6 +16,7 @@ import PlayerControls from "@/components/ui/player-controls";
 import SidePanel from "@/components/ui/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
+
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
@@ -59,7 +60,7 @@ function Index() {
     loop,
     toggleLoop,
   } = usePlayerStore();
-  const { windowMovement } = useSettingsStore();
+  const { windowMovement, keybinds } = useSettingsStore();
 
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
@@ -106,62 +107,62 @@ function Index() {
       }
       console.log(event.code);
 
-      if (event.code === "Space" || event.key === "k") {
+      if (event.code === keybinds.playPause || event.key === "k") {
         event.preventDefault();
         playPause();
       }
 
-      if (event.key === "Enter") {
+      if (event.key === keybinds.fullscreen) {
         event.preventDefault();
         toggleFullscreen();
       }
 
-      if (event.key === "ArrowUp") {
+      if (event.key === keybinds.volumeUp) {
         event.preventDefault();
         increaseVolumeByStep();
       }
-      if (event.key === "ArrowDown") {
+      if (event.key === keybinds.volumeUp) {
         event.preventDefault();
         decreaseVolumeByStep();
       }
-      if (event.key === "ArrowLeft") {
+      if (event.key === keybinds.seekBackward) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.max(currentTime - 5, 0), "seconds");
       }
-      if (event.key === "ArrowRight") {
+      if (event.key === keybinds.seekForward) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
 
         video?.seekTo(Math.min(currentTime + 5, videoDuration), "seconds");
       }
-      if (event.key === "j") {
+      if (event.key === keybinds.longSeekBackward) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.max(currentTime - 30, 0), "seconds");
       }
-      if (event.key === "l") {
+      if (event.key === keybinds.longSeekForward) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.min(currentTime + 30, videoDuration), "seconds");
       }
 
-      if (event.key === "m") {
+      if (event.key === keybinds.mute) {
         event.preventDefault();
         toggleMute();
       }
 
-      if (event.ctrlKey && event.key == "o") {
+      if (event.ctrlKey && event.key == keybinds.openFiles) {
         event.preventDefault();
         openFiles();
       }
 
-      if (event.ctrlKey && event.key == "s") {
+      if (event.ctrlKey && event.key == keybinds.toggleSidePanel) {
         event.preventDefault();
         toggleSidePanel();
       }
 
-      if (event.ctrlKey && event.key == "p") {
+      if (event.ctrlKey && event.key == keybinds.toggleSettings) {
         event.preventDefault();
         toggleSettings();
       }
@@ -312,18 +313,24 @@ function Index() {
             <div
               id="draggableRef2"
               ref={draggableRef2}
-              className={`relative w-full h-full z-10 select-none ${currentFileList.length === 0 && "cursor-pointer"}`}
+              className={`relative w-full h-full z-10 select-none ${
+                currentFileList.length === 0 && "cursor-pointer"
+              }`}
             ></div>
           </div>
         </div>
       </ResizablePanel>
       <ResizableHandle
-        className={`rounded-tl-lg bg-border/50 relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${!isSidePanelOpen && "hidden"}`}
+        className={`rounded-tl-lg bg-border/50 relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${
+          !isSidePanelOpen && "hidden"
+        }`}
       />
       {isSettingsOpen && <Settings />}
       {!isVideoHidden && (
         <ResizablePanel
-          className={`flex flex-col justify-end ${!isSidePanelOpen && "hidden"}`}
+          className={`flex flex-col justify-end ${
+            !isSidePanelOpen && "hidden"
+          }`}
           defaultSize={20}
           minSize={10}
           maxSize={50}
