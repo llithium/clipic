@@ -85,6 +85,13 @@ function Index() {
     updateSliderValue([progress.played]);
     updatePlayedSeconds(progress.playedSeconds);
   }
+  useEffect(() => {
+    if (currentFileList.length === 1 && videoDuration <= 15) {
+      !loop && toggleLoop();
+    } else if (loop) {
+      toggleLoop();
+    }
+  }, [currentFileList]);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
@@ -267,17 +274,9 @@ function Index() {
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
         extension: currentFileList[currentIndex]?.fileExtension,
       });
-
-    if (currentFileList.length === 1 && videoDuration <= 15) {
-      !loop && toggleLoop();
-    } else if (loop) {
-      toggleLoop();
-    }
   }, [
     currentFileList,
     currentIndex,
-    loop,
-    toggleLoop,
     updateCurrentIndex,
     updateCurrentVideo,
     updateIsPlaying,
