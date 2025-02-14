@@ -338,12 +338,12 @@ function Index() {
       {!isVideoHidden && (
         <ResizablePanel
           id="sidebar"
-          className={`flex flex-col justify-end ${
-            !isSidePanelOpen && "hidden"
+          className={`flex flex-col justify-end transition-all ${
+            !isSidePanelOpen && "invisible translate-x-40"
           }`}
           defaultSize={20}
-          minSize={10}
-          maxSize={25}
+          minSize={20}
+          maxSize={isSidePanelOpen ? 25 : 0}
           order={2}
         >
           <SidePanel />
