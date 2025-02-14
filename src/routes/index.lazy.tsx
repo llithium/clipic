@@ -295,7 +295,7 @@ function Index() {
 
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel>
+      <ResizablePanel id="video" order={1}>
         <div className={`w-full h-full ${isVideoHidden && "hidden"}`}>
           <div
             ref={draggableRef}
@@ -330,19 +330,21 @@ function Index() {
         </div>
       </ResizablePanel>
       <ResizableHandle
-        className={`rounded-tl-lg bg-border/50 relative z-50 w-[3px] h-[calc(100vh-40px)] translate-y-10 ${
+        className={`rounded-tl-lg bg-border/50 relative z-50 h-[calc(100vh-40px)] translate-y-10 ${
           !isSidePanelOpen && "hidden"
         }`}
       />
       {isSettingsOpen && <Settings />}
       {!isVideoHidden && (
         <ResizablePanel
+          id="sidebar"
           className={`flex flex-col justify-end ${
             !isSidePanelOpen && "hidden"
           }`}
           defaultSize={20}
           minSize={10}
-          maxSize={50}
+          maxSize={25}
+          order={2}
         >
           <SidePanel />
         </ResizablePanel>

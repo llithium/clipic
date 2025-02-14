@@ -45,7 +45,7 @@ function SidePanel() {
   };
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <ScrollArea className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 flex flex-col gap-1 overflow-y-auto">
+      <ScrollArea className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 pr-2 mr-1 flex flex-col gap-1 overflow-y-auto">
         <Droppable droppableId="droppable-1">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -60,8 +60,8 @@ function SidePanel() {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`hover:opacity-80 cursor-pointer active:opacity-60 transition-all px-2 py-1 ${
-                        currentIndex === i && "bg-border"
+                      className={`hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 ${
+                        currentIndex === i && "bg-secondary"
                       }`}
                       onClick={() => updateCurrentIndex(i)}
                     >
