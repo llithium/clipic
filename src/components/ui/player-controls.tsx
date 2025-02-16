@@ -167,7 +167,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
               className="bg-transparent rounded-full"
               onClick={previousVideo}
             >
-              <Icon icon="mingcute:skip-previous-fill" className="h-8 w-8" />
+              <Icon icon="mingcute:skip-previous-line" className="h-8 w-8" />
             </Button>
           ) : null}
           <Button
@@ -189,7 +189,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
               className="bg-transparent rounded-full"
               onClick={nextVideo}
             >
-              <Icon icon="mingcute:skip-forward-fill" className="h-8 w-8" />
+              <Icon icon="mingcute:skip-forward-line" className="h-8 w-8" />
             </Button>
           ) : null}
           <span className="text-neutral-50">

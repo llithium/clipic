@@ -16,6 +16,7 @@ import PlayerControls from "@/components/ui/player-controls";
 import SidePanel from "@/components/ui/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
+import { ACCEPTED_EXTENSIONS } from "@/lib/files";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -94,24 +95,22 @@ function Index() {
       }
     }
     get_opened_file_args();
-  }, []);
 
-  useEffect(() => {
     if (currentFileList.length === 1 && videoDuration <= 15) {
       !loop && toggleLoop();
     } else if (loop) {
       toggleLoop();
     }
-  }, [currentFileList]);
+  }, []);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
       if (event.payload.type === "drop") {
         console.log("User dropped", event.payload.paths);
 
-        const fileList: SelectedFileList = await toFileList(
-          event.payload.paths
-        );
+        const fileList: SelectedFileList = (
+          await toFileList(event.payload.paths)
+        ).filter((f) => ACCEPTED_EXTENSIONS.includes(f.fileExtension));
 
         const mouseX = event.payload.position.x;
         const mouseY = event.payload.position.y;
@@ -124,13 +123,32 @@ function Index() {
           mouseY >= sidePanelRect.top &&
           mouseY <= sidePanelRect.bottom
         ) {
-          console.log("Drop is over the SidePanel");
-          const fileList: SelectedFileList = await toFileList(
-            event.payload.paths
+          const sidePanelItems =
+            sidePanelRef.current?.querySelectorAll(".draggable-item");
+          let insertIndex = currentFileList.length;
+
+          if (sidePanelItems) {
+            for (let i = 0; i < sidePanelItems.length; i++) {
+              const itemRect = sidePanelItems[i].getBoundingClientRect();
+              if (mouseY < itemRect.top + itemRect.height / 2) {
+                insertIndex = i;
+                break;
+              }
+            }
+          }
+          const updatedFileList = [
+            ...currentFileList.slice(0, insertIndex),
+            ...fileList,
+            ...currentFileList.slice(insertIndex),
+          ];
+          const currentVideoPath = currentFileList[currentIndex]?.filePath;
+          const newIndex = updatedFileList.findIndex(
+            (video) => video.filePath === currentVideoPath
           );
-          updateCurrentFileList(currentFileList.concat(fileList));
+
+          updateCurrentFileList(updatedFileList);
+          updateCurrentIndex(newIndex);
         } else {
-          console.log("Drop is NOT over the SidePanel");
           updateCurrentFileList(fileList);
         }
       } else {

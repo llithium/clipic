@@ -19,7 +19,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
       if (!result.destination) {
         return;
       }
-      const currentVideoId = currentFileList[currentIndex].fileName;
+      const currentVideoId = currentFileList[currentIndex].filePath;
 
       const updatedFileList: SelectedFileList = reorder(
         currentFileList,
@@ -28,7 +28,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
       );
       updateCurrentFileList(updatedFileList);
       const newIndex = updatedFileList.findIndex(
-        (video) => video.fileName === currentVideoId
+        (video) => video.filePath === currentVideoId
       );
       updateCurrentIndex(newIndex);
     },
@@ -57,8 +57,8 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
             <div {...provided.droppableProps} ref={provided.innerRef}>
               {currentFileList.map((video, i) => (
                 <Draggable
-                  key={`${video.fileName}-${i}`}
-                  draggableId={`${video.fileName}-${i}`}
+                  key={`${video.filePath}-${i}`}
+                  draggableId={`${video.filePath}-${i}`}
                   index={i}
                 >
                   {(provided) => (
@@ -66,7 +66,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 ${
+                      className={`draggable-item hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 ${
                         currentIndex === i && "bg-secondary"
                       }`}
                       onClick={() => updateCurrentIndex(i)}

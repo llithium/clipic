@@ -5,8 +5,9 @@ use std::{ffi::OsString, fs::read_dir, path::PathBuf};
 
 use tauri::{AppHandle, Manager};
 
-const EXTENSIONS: [&str; 9] = [
-    "mp4", "avi", "mkv", "mov", "flv", "webm", "wmv", "mpeg", "m4v",
+const EXTENSIONS: [&str; 17] = [
+    "mp4", "webm", "ogg", "mov", "avi", "mkv", "m4v", "flv", "wmv", "3gp", "mpeg", "mpg", "mp3",
+    "wav", "m4a", "aac", "flac",
 ];
 
 #[derive(Debug, serde::Serialize, Clone)]
