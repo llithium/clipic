@@ -37,6 +37,8 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     updateCurrentTooltipLeft,
     updateHoveredTime,
     currentVideo,
+    toggleLoop,
+    loop,
   } = usePlayerStore();
   const { windowMovement } = useSettingsStore();
   function handleSeek(value: number[]) {
@@ -66,7 +68,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
       .padStart(formattedHours !== "0" ? 2 : 1, "0");
     const formattedSeconds = secs.toString().padStart(2, "0");
 
-    return `${formattedHours !== "0" ? formattedHours + ":" : ""}${formattedMinutes + ":"}${formattedSeconds}`;
+    return `${formattedHours !== "0" ? formattedHours + ":" : ""}${
+      formattedMinutes + ":"
+    }${formattedSeconds}`;
   }
 
   function handleSliderMouseMove(
@@ -121,7 +125,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
   return (
     <div
       ref={draggableRef2}
-      className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100 ${!currentVideo?.name ? "hidden" : "flex"}`}
+      className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100 ${
+        !currentVideo?.name ? "hidden" : "flex"
+      }`}
     >
       <TooltipProvider delayDuration={200}>
         <Tooltip>
@@ -171,9 +177,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
             onClick={playPause}
           >
             {isPlaying ? (
-              <Icon icon="mingcute:pause-fill" className="h-8 w-8" />
+              <Icon icon="mingcute:pause-line" className="h-8 w-8" />
             ) : (
-              <Icon icon="mingcute:play-fill" className="h-8 w-8" />
+              <Icon icon="mingcute:play-line" className="h-8 w-8" />
             )}
           </Button>
           {currentIndex < currentFileList.length - 1 ? (
@@ -198,9 +204,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
             onClick={toggleMute}
           >
             {isMuted ? (
-              <Icon icon="mingcute:volume-mute-fill" className="h-4 w-4" />
+              <Icon icon="mingcute:volume-mute-line" className="h-4 w-4" />
             ) : (
-              <Icon icon="mingcute:volume-fill" className="h-4 w-4" />
+              <Icon icon="mingcute:volume-line" className="h-4 w-4" />
             )}
           </Button>
           <Slider
@@ -210,13 +216,35 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
             value={isMuted ? [0] : [currentVolume]}
             onValueChange={handleVolumeSlider}
           />
+
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger className="flex items-center justify-center">
+                <Button
+                  size="icon"
+                  variant={"icon"}
+                  className="bg-transparent rounded-full w-8 h-8"
+                  onClick={toggleLoop}
+                >
+                  <Icon
+                    icon="mingcute:repeat-line"
+                    className={`h-6 w-6 ${!loop && "opacity-25"}`}
+                  />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span>Loop</span>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+
           <Button
             size="icon"
             variant={"icon"}
             className="bg-transparent rounded-full w-8 h-8"
             onClick={toggleFullscreen}
           >
-            <Icon icon="mingcute:fullscreen-fill" className="h-6 w-6" />
+            <Icon icon="mingcute:fullscreen-line" className="h-6 w-6" />
           </Button>
         </div>
       </div>

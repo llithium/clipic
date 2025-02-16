@@ -38,18 +38,28 @@ function TitleBar() {
 
   return (
     <div
-      className={`absolute top-0 flex justify-center items-center select-none w-full z-50 h-8 bg-gradient-to-b from-black/30 ${isVideoHidden ? "bg-inherit" : currentFileList.length > 0 ? "opacity-0" : "bg-inherit"} transition-opacity duration-700 ease-fast-out hover:opacity-100`}
+      className={`absolute top-0 flex justify-center items-center select-none w-full z-50 h-10 bg-gradient-to-b from-black/30 ${
+        isVideoHidden
+          ? "bg-inherit"
+          : currentFileList.length > 0
+          ? "opacity-0"
+          : "bg-inherit"
+      } transition-opacity duration-700 ease-fast-out hover:opacity-100`}
     >
       <div>
         <h1
-          className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${isVideoHidden && "hidden"}`}
+          className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${
+            isVideoHidden && "hidden"
+          }`}
         >
           {currentVideo?.name}{" "}
           {currentFileList.length > 1 &&
             `[${currentIndex + 1}/${currentFileList.length}]`}
         </h1>
         <h1
-          className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${!isSettingsOpen && "hidden"}`}
+          className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${
+            !isSettingsOpen && "hidden"
+          }`}
         >
           Settings
         </h1>
@@ -61,7 +71,7 @@ function TitleBar() {
         <Button
           size="icon"
           variant={"icon"}
-          className="bg-transparent rounded-none w-8 h-8 p-2 hover:bg-neutral-400/20 relative z-100"
+          className="bg-transparent rounded-none w-10 h-10 p-2 hover:bg-neutral-400/20 relative z-100"
           onClick={() => appWindow.minimize()}
         >
           <Minus className="w-5 h-5 dark:text-neutral-50" />
@@ -69,7 +79,7 @@ function TitleBar() {
         <Button
           size="icon"
           variant={"icon"}
-          className="bg-transparent rounded-none w-7 h-7 p-2 hover:bg-neutral-400/20 relative z-100"
+          className="bg-transparent rounded-none w-10 h-10 p-2 hover:bg-neutral-400/20 relative z-100"
           onClick={async () =>
             (await appWindow.isFullscreen())
               ? toggleFullscreen()
@@ -81,7 +91,7 @@ function TitleBar() {
         <Button
           size="icon"
           variant={"icon"}
-          className="bg-transparent rounded-none w-8 h-8 p-2 hover:bg-red-700/80 relative z-100"
+          className="bg-transparent rounded-none w-10 h-10 p-2 hover:bg-red-700/80 relative z-100"
           onClick={() => appWindow.close()}
         >
           <X className="w-5 h-5 dark:text-neutral-50" />
