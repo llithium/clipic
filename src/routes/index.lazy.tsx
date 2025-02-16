@@ -68,6 +68,7 @@ function Index() {
   const draggableRef3 = useRef<HTMLDivElement>(null);
 
   const video = videoRef.current;
+  const sidePanelRef = useRef<HTMLDivElement>(null);
 
   const toFileList = async (array: string[]) => {
     return await Promise.all(
@@ -112,7 +113,26 @@ function Index() {
           event.payload.paths
         );
 
-        updateCurrentFileList(fileList);
+        const mouseX = event.payload.position.x;
+        const mouseY = event.payload.position.y;
+
+        const sidePanelRect = sidePanelRef.current?.getBoundingClientRect();
+        if (
+          sidePanelRect &&
+          mouseX >= sidePanelRect.left &&
+          mouseX <= sidePanelRect.right &&
+          mouseY >= sidePanelRect.top &&
+          mouseY <= sidePanelRect.bottom
+        ) {
+          console.log("Drop is over the SidePanel");
+          const fileList: SelectedFileList = await toFileList(
+            event.payload.paths
+          );
+          updateCurrentFileList(currentFileList.concat(fileList));
+        } else {
+          console.log("Drop is NOT over the SidePanel");
+          updateCurrentFileList(fileList);
+        }
       } else {
         console.log("File drop cancelled");
       }
@@ -346,7 +366,7 @@ function Index() {
           maxSize={isSidePanelOpen ? 25 : 0}
           order={2}
         >
-          <SidePanel />
+          <SidePanel ref={sidePanelRef} />
         </ResizablePanel>
       )}
     </ResizablePanelGroup>

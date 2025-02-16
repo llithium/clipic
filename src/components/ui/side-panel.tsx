@@ -1,9 +1,11 @@
 import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
 import { ScrollArea } from "./scroll-area";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
-import { useCallback } from "react";
+import { useCallback, forwardRef } from "react";
 
-function SidePanel() {
+interface SidePanelProps {}
+
+const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
   const {
     currentFileList,
     updateCurrentFileList,
@@ -32,6 +34,7 @@ function SidePanel() {
     },
     [currentFileList, currentIndex, updateCurrentFileList, updateCurrentIndex]
   );
+
   const reorder = (
     list: SelectedFileList,
     startIndex: number,
@@ -40,12 +43,15 @@ function SidePanel() {
     const result: SelectedFileList = Array.from(list);
     const [removed] = result.splice(startIndex, 1);
     result.splice(endIndex, 0, removed);
-
     return result;
   };
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
-      <ScrollArea className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 pr-2 mr-1 flex flex-col gap-1 overflow-y-auto">
+      <ScrollArea
+        ref={ref}
+        className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 pr-2 mr-1 flex flex-col gap-1 overflow-y-auto"
+      >
         <Droppable droppableId="droppable-1">
           {(provided) => (
             <div {...provided.droppableProps} ref={provided.innerRef}>
@@ -79,6 +85,6 @@ function SidePanel() {
       </ScrollArea>
     </DragDropContext>
   );
-}
+});
 
 export default SidePanel;
