@@ -32,6 +32,7 @@ type State = {
   isSettingsOpen: boolean;
   isVideoHidden: boolean;
   loop: boolean;
+  recentlyPlayed: SelectedFile[];
 };
 type Actions = {
   updateCurrentFileList: (state: SelectedFileList) => void;
@@ -59,12 +60,16 @@ type Actions = {
   toggleSettings: () => void;
   toggleVideoHidden: () => void;
   toggleLoop: () => void;
+  addRecentlyPlayed: (file: SelectedFile) => void;
 };
 
 const volumeStep = 0.05;
 const store = await load("store.json", { autoSave: false });
 const volume: number = (await store.get("volume")) || 0.5;
 const sidePanel: boolean = (await store.get("side-panel")) || false;
+const muted: boolean = (await store.get("muted")) || false;
+const recent: SelectedFile[] = (await store.get("recent")) || [];
+const MAX_RECENTLY_PLAYED = 50;
 
 export const usePlayerStore = create<State & Actions>((set, get) => ({
   currentFileList: [],
@@ -76,13 +81,14 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   playedSeconds: 0,
   videoDuration: 0,
   currentVolume: volume,
-  isMuted: false,
+  isMuted: muted,
   currentTooltipLeft: 0,
   isSidePanelOpen: sidePanel,
   shortcutsDisabled: false,
   isSettingsOpen: false,
   isVideoHidden: false,
   loop: false,
+  recentlyPlayed: recent,
 
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
@@ -97,7 +103,11 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     await store.set("volume", state);
     await store.save();
   },
-  updateIsMuted: (state) => set({ isMuted: state }),
+  updateIsMuted: async (state) => {
+    set({ isMuted: state });
+    await store.set("muted", state);
+    await store.save();
+  },
   updateCurrentTooltipLeft: (state) => set({ currentTooltipLeft: state }),
   updateShortcutsDisabled: (state) => set({ shortcutsDisabled: state }),
 
@@ -137,15 +147,19 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     await store.set("side-panel", get().isSidePanelOpen);
     await store.save();
   },
-  toggleMute: () =>
+  toggleMute: async () => {
     set((state) => {
       if (state.isMuted && state.currentVolume === 0) {
         state.currentVolume = 0.5;
+
         return { currentVolume: 0.5, isMuted: false };
       } else {
         return { isMuted: !state.isMuted };
       }
-    }),
+    });
+    await store.set("muted", get().isMuted);
+    await store.save();
+  },
   openFiles: async () => {
     const fileList: SelectedFileList = await getFiles();
     if (fileList.length > 0) {
@@ -178,4 +192,27 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   toggleVideoHidden: () =>
     set((state) => ({ isVideoHidden: !state.isVideoHidden })),
   toggleLoop: () => set((state) => ({ loop: !state.loop })),
+  addRecentlyPlayed: async (file) => {
+    set((state) => {
+      const validRecentlyPlayed = state.recentlyPlayed.filter(
+        (item) => item !== null && item !== undefined
+      );
+
+      const alreadyInList = validRecentlyPlayed.some(
+        (item) => item.filePath === file.filePath
+      );
+
+      if (alreadyInList) {
+        return { recentlyPlayed: validRecentlyPlayed };
+      }
+
+      const updatedList = [file, ...validRecentlyPlayed];
+      if (updatedList.length > MAX_RECENTLY_PLAYED) {
+        updatedList.pop();
+      }
+      return { recentlyPlayed: updatedList };
+    });
+    await store.set("recent", get().recentlyPlayed);
+    await store.save();
+  },
 }));

@@ -34,7 +34,6 @@ function Settings() {
   const { theme, setTheme } = useTheme();
   const { toggleSettings } = usePlayerStore();
   const { windowMovement, updateWindowMovement } = useSettingsStore();
-  console.log(windowMovement);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({

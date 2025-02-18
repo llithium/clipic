@@ -60,6 +60,7 @@ function Index() {
     isVideoHidden,
     loop,
     toggleLoop,
+    addRecentlyPlayed,
   } = usePlayerStore();
   const { windowMovement, keybinds } = useSettingsStore();
 
@@ -97,7 +98,9 @@ function Index() {
     get_opened_file_args();
 
     if (currentFileList.length === 1 && videoDuration <= 15) {
-      !loop && toggleLoop();
+      if (!loop) {
+        toggleLoop();
+      }
     } else if (loop) {
       toggleLoop();
     }
@@ -106,8 +109,6 @@ function Index() {
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
       if (event.payload.type === "drop") {
-        console.log("User dropped", event.payload.paths);
-
         const fileList: SelectedFileList = (
           await toFileList(event.payload.paths)
         ).filter((f) => ACCEPTED_EXTENSIONS.includes(f.fileExtension));
@@ -151,8 +152,6 @@ function Index() {
         } else {
           updateCurrentFileList(fileList);
         }
-      } else {
-        console.log("File drop cancelled");
       }
     });
 
@@ -160,7 +159,6 @@ function Index() {
       if (shortcutsDisabled) {
         return;
       }
-      console.log(event.code);
 
       if (event.code === keybinds.playPause || event.key === "k") {
         event.preventDefault();
@@ -316,12 +314,13 @@ function Index() {
   ]);
 
   useEffect(() => {
-    currentFileList &&
+    if (currentFileList) {
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
         extension: currentFileList[currentIndex]?.fileExtension,
       });
+    }
   }, [
     currentFileList,
     currentIndex,
@@ -330,6 +329,13 @@ function Index() {
     updateIsPlaying,
     videoDuration,
   ]);
+
+  useEffect(() => {
+    if (currentFileList && currentFileList[currentIndex]) {
+      addRecentlyPlayed(currentFileList[currentIndex]);
+    }
+  }, [currentVideo, currentIndex, currentFileList, addRecentlyPlayed]);
+
   //! TODO
   // useEffect(() => {
   //   async function getThumbnails() {
