@@ -50,6 +50,7 @@ const toFileList = async (array: string[]): Promise<SelectedFileList> => {
         fileName: await path.basename(file),
         filePath: file,
         fileExtension: await path.extname(file),
+        thumbnailPath: null,
       };
     })
   );

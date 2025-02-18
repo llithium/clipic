@@ -7,6 +7,7 @@ export interface SelectedFile {
   fileName: string;
   filePath: string;
   fileExtension: string;
+  thumbnailPath?: string | null;
 }
 export interface CurrentVideo {
   name: string;

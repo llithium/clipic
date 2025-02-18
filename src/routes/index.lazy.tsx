@@ -330,6 +330,13 @@ function Index() {
     updateIsPlaying,
     videoDuration,
   ]);
+  //! TODO
+  // useEffect(() => {
+  //   async function getThumbnails() {
+  //     const fileListWithThumbnails = await generateThumbnails(currentFileList);
+  //   }
+  //   getThumbnails();
+  // }, [currentFileList]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
