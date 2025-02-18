@@ -17,6 +17,7 @@ import SidePanel from "@/components/ui/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
 import { ACCEPTED_EXTENSIONS } from "@/lib/files";
+import { generateThumbnails } from "@/lib/utils";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -331,18 +332,16 @@ function Index() {
   ]);
 
   useEffect(() => {
-    if (currentFileList && currentFileList[currentIndex]) {
-      addRecentlyPlayed(currentFileList[currentIndex]);
+    async function recent() {
+      if (currentFileList && currentFileList[currentIndex]) {
+        const withThumbnail: SelectedFileList = (await generateThumbnails([
+          currentFileList[currentIndex],
+        ])) as SelectedFileList;
+        addRecentlyPlayed(withThumbnail[0]);
+      }
     }
+    recent();
   }, [currentVideo, currentIndex, currentFileList, addRecentlyPlayed]);
-
-  //! TODO
-  // useEffect(() => {
-  //   async function getThumbnails() {
-  //     const fileListWithThumbnails = await generateThumbnails(currentFileList);
-  //   }
-  //   getThumbnails();
-  // }, [currentFileList]);
 
   return (
     <ResizablePanelGroup direction="horizontal">

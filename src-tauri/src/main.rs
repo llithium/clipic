@@ -141,13 +141,19 @@ async fn generate_thumbnails(app: AppHandle, videos: Vec<File>) -> Result<Vec<Fi
     for file in videos {
         let file_path = file.file_path.clone();
         let file_name = file.file_name.clone();
+        let file_name_without_extension = PathBuf::from(file.file_name.clone())
+            .file_stem()
+            .unwrap_or_default()
+            .to_owned()
+            .to_string_lossy()
+            .to_string();
         let file_extension = file.file_extension.clone();
         let output_dir_clone = output_dir.clone();
         let join_handle: JoinHandle<Result<File, tauri::Error>> = task::spawn(async move {
             let output_path = output_dir_clone.join(format!(
                 "{}/thumbnails/{}.webp",
                 output_dir_clone.display(),
-                file.file_name
+                file_name_without_extension
             ));
 
             if output_path.exists() {
