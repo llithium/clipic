@@ -3,6 +3,7 @@
 
 use std::{
     fs::{self, read_dir},
+    os::windows::process::CommandExt,
     path::PathBuf,
     process::Command,
 };
@@ -177,6 +178,7 @@ async fn generate_thumbnails(app: AppHandle, videos: Vec<File>) -> Result<Vec<Fi
                 .arg("-f")
                 .arg("webp")
                 .arg(&output_path)
+                .creation_flags(0x08000000)
                 .output()
                 .map_err(|e| {
                     tauri::Error::Anyhow(anyhow!("Thumbnail generation failed {}", e));
@@ -234,7 +236,10 @@ fn clean_thumbnail_dir(app: &AppHandle) -> anyhow::Result<()> {
 }
 
 fn check_ffmpeg_installed() -> anyhow::Result<bool> {
-    let output = Command::new("ffmpeg").arg("-version").output();
+    let output = Command::new("ffmpeg")
+        .arg("-version")
+        .creation_flags(0x08000000)
+        .output();
 
     match output {
         Ok(output) => Ok(output.status.success()),
