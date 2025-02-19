@@ -15,6 +15,12 @@ export interface CurrentVideo {
   extension: string;
 }
 
+export enum OpenComponent {
+  None,
+  Home,
+  Settings,
+}
+
 type State = {
   currentFileList: SelectedFileList;
   currentVideo: CurrentVideo | undefined;
@@ -30,9 +36,11 @@ type State = {
   isSidePanelOpen: boolean;
   shortcutsDisabled: boolean;
   isSettingsOpen: boolean;
+  isHomeOpen: boolean;
   isVideoHidden: boolean;
   loop: boolean;
   recentlyPlayed: SelectedFile[];
+  openComponent: OpenComponent;
 };
 type Actions = {
   updateCurrentFileList: (state: SelectedFileList) => void;
@@ -47,6 +55,7 @@ type Actions = {
   updateIsMuted: (state: boolean) => void;
   updateCurrentTooltipLeft: (state: number) => void;
   updateShortcutsDisabled: (state: boolean) => void;
+  updateOpenComponent: (state: OpenComponent) => void;
 
   playPause: () => void;
   nextVideo: () => void;
@@ -58,6 +67,7 @@ type Actions = {
   openFiles: () => void;
   openDirectory: () => void;
   toggleSettings: () => void;
+  toggleHome: () => void;
   toggleVideoHidden: () => void;
   toggleLoop: () => void;
   addRecentlyPlayed: (file: SelectedFile) => void;
@@ -86,9 +96,11 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   isSidePanelOpen: sidePanel,
   shortcutsDisabled: false,
   isSettingsOpen: false,
+  isHomeOpen: false,
   isVideoHidden: false,
   loop: false,
   recentlyPlayed: recent,
+  openComponent: OpenComponent.None,
 
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
@@ -184,11 +196,36 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       });
     }
   },
-  toggleSettings: () =>
-    set((state) => ({
-      isSettingsOpen: !state.isSettingsOpen,
-      isVideoHidden: !state.isVideoHidden,
-    })),
+  toggleSettings: () => {
+    if (get().openComponent === OpenComponent.Settings) {
+      set(() => ({
+        isSettingsOpen: false,
+        isVideoHidden: false,
+        openComponent: OpenComponent.None,
+      }));
+    } else {
+      set(() => ({
+        isSettingsOpen: true,
+        isVideoHidden: true,
+        openComponent: OpenComponent.Settings,
+      }));
+    }
+  },
+  toggleHome: () => {
+    if (get().openComponent === OpenComponent.Home) {
+      set(() => ({
+        isHomeOpen: false,
+        isVideoHidden: false,
+        openComponent: OpenComponent.None,
+      }));
+    } else {
+      set(() => ({
+        isHomeOpen: true,
+        isVideoHidden: true,
+        openComponent: OpenComponent.Home,
+      }));
+    }
+  },
   toggleVideoHidden: () =>
     set((state) => ({ isVideoHidden: !state.isVideoHidden })),
   toggleLoop: () => set((state) => ({ loop: !state.loop })),
@@ -215,4 +252,5 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     await store.set("recent", get().recentlyPlayed);
     await store.save();
   },
+  updateOpenComponent: (state) => set({ openComponent: state }),
 }));

@@ -40,6 +40,7 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
     toggleSettings,
     loop,
     toggleLoop,
+    toggleHome,
   } = usePlayerStore();
   const [dialogOpen, setDialogOpen] = useState(false);
 
@@ -58,6 +59,10 @@ function AppContextMenu({ children }: { children: React.ReactNode }) {
           {children}
         </ContextMenuTrigger>
         <ContextMenuContent className="w-64">
+          <ContextMenuItem onSelect={toggleHome} inset>
+            Home
+            <ContextMenuShortcut>Ctrl+E</ContextMenuShortcut>
+          </ContextMenuItem>
           <ContextMenuItem onSelect={previousVideo} inset>
             Previous
             <ContextMenuShortcut></ContextMenuShortcut>

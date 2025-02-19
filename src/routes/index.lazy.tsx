@@ -3,7 +3,11 @@ import { useEffect, useRef } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
 import * as path from "@tauri-apps/api/path";
-import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
+import {
+  OpenComponent,
+  SelectedFileList,
+  usePlayerStore,
+} from "@/hooks/usePlayerStore";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { toggleFullscreen } from "@/lib/ui";
@@ -18,6 +22,7 @@ import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
 import { ACCEPTED_EXTENSIONS } from "@/lib/files";
 import { generateThumbnails } from "@/lib/utils";
+import Home from "@/components/home";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -57,11 +62,15 @@ function Index() {
     openFiles,
     shortcutsDisabled,
     toggleSettings,
-    isSettingsOpen,
     isVideoHidden,
     loop,
     toggleLoop,
+    recentlyPlayed,
     addRecentlyPlayed,
+    openComponent,
+    updateOpenComponent,
+    toggleVideoHidden,
+    toggleHome,
   } = usePlayerStore();
   const { windowMovement, keybinds } = useSettingsStore();
 
@@ -219,6 +228,10 @@ function Index() {
       if (event.ctrlKey && event.key == keybinds.toggleSettings) {
         event.preventDefault();
         toggleSettings();
+      }
+      if (event.ctrlKey && event.key == keybinds.toggleHome) {
+        event.preventDefault();
+        toggleHome();
       }
     }
 
@@ -384,7 +397,15 @@ function Index() {
           !isSidePanelOpen && "hidden"
         }`}
       />
-      {isSettingsOpen && <Settings />}
+      {openComponent === OpenComponent.Home && (
+        <Home
+          recentlyPlayed={recentlyPlayed}
+          updateCurrentFileList={updateCurrentFileList}
+          updateOpenComponent={updateOpenComponent}
+          toggleVideoHiedden={toggleVideoHidden}
+        />
+      )}
+      {openComponent === OpenComponent.Settings && <Settings />}
       {!isVideoHidden && (
         <ResizablePanel
           id="sidebar"

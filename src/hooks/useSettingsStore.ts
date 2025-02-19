@@ -13,6 +13,7 @@ interface Keybinds {
   openFiles: string;
   toggleSidePanel: string;
   toggleSettings: string;
+  toggleHome: string;
 }
 type State = {
   windowMovement: string;
@@ -39,6 +40,7 @@ const keybinds: Keybinds = (await store.get("keybinds")) || {
   openFiles: "o",
   toggleSidePanel: "s",
   toggleSettings: "p",
+  toggleHome: "e",
 };
 
 export const useSettingsStore = create<State & Actions>((set) => ({
