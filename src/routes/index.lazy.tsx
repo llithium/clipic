@@ -16,8 +16,8 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import PlayerControls from "@/components/ui/player-controls";
-import SidePanel from "@/components/ui/side-panel";
+import PlayerControls from "@/components/player-controls";
+import SidePanel from "@/components/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
 import { ACCEPTED_EXTENSIONS } from "@/lib/files";

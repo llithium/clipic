@@ -8,10 +8,10 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "./tooltip";
+} from "./ui/tooltip";
 import ReactPlayer from "react-player";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { Slider } from "./slider";
+import { Slider } from "./ui/slider";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
 
 const tooltipWidth = 80;
@@ -120,7 +120,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
       draggable?.removeEventListener("mousedown", handleDrag);
       draggable2?.removeEventListener("mousedown", handleDrag);
     };
-  }, [playPause]);
+  }, [playPause, windowMovement]);
 
   return (
     <div

@@ -44,7 +44,7 @@ function TitleBar() {
           : currentFileList.length > 0
           ? "opacity-0"
           : "bg-inherit"
-      } transition-opacity duration-700 ease-fast-out hover:opacity-100`}
+      } transition-opacity duration-700 ease-fast-out hover:opacity-100 backdrop-blur-md`}
     >
       <div>
         <h1

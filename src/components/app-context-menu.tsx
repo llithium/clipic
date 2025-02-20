@@ -21,10 +21,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "./input";
-import { Label } from "./label";
-import { Button } from "./button";
 import { useEffect, useState } from "react";
+import { Label } from "./ui/label";
+import { Input } from "./ui/input";
+import { Button } from "./ui/button";
 
 function AppContextMenu({ children }: { children: React.ReactNode }) {
   const {

@@ -1,5 +1,5 @@
-import AppContextMenu from "@/components/ui/app-context-menu";
-import TitleBar from "@/components/ui/title-bar";
+import AppContextMenu from "@/components/app-context-menu";
+import TitleBar from "@/components/title-bar";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 
 const __root = () => {

@@ -1,9 +1,9 @@
 import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
-import { ScrollArea } from "./scroll-area";
+import { ScrollArea } from "./ui/scroll-area";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useCallback, forwardRef } from "react";
 
-interface SidePanelProps {}
+type SidePanelProps = object;
 
 const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
   const {
