@@ -9,12 +9,13 @@ function Home({
   recentlyPlayed,
   updateCurrentFileList,
   updateOpenComponent,
-  toggleVideoHiedden,
+  updateIsPlaying,
 }: {
   recentlyPlayed: SelectedFile[];
   updateCurrentFileList: (state: SelectedFileList) => void;
   updateOpenComponent: (state: OpenComponent) => void;
-  toggleVideoHiedden: () => void;
+  toggleVideoHidden: () => void;
+  updateIsPlaying: (state: boolean) => void;
 }) {
   return (
     <div className="flex flex-wrap items-center mt-10 pb-4 px-4 gap-2 overflow-y-scroll">
@@ -24,8 +25,8 @@ function Home({
           className="mt-4 flex flex-col w-44 h-56 rounded-2xl cursor-pointer gap-1"
           onClick={() => {
             updateCurrentFileList([recentlyPlayed[index]]);
-            updateOpenComponent(OpenComponent.None);
-            toggleVideoHiedden();
+            updateOpenComponent(OpenComponent.Video);
+            updateIsPlaying(true);
           }}
         >
           <img

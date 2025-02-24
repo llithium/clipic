@@ -19,6 +19,7 @@ export enum OpenComponent {
   None,
   Home,
   Settings,
+  Video,
 }
 
 type State = {
@@ -35,9 +36,6 @@ type State = {
   currentTooltipLeft: number;
   isSidePanelOpen: boolean;
   shortcutsDisabled: boolean;
-  isSettingsOpen: boolean;
-  isHomeOpen: boolean;
-  isVideoHidden: boolean;
   loop: boolean;
   recentlyPlayed: SelectedFile[];
   openComponent: OpenComponent;
@@ -95,9 +93,6 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   currentTooltipLeft: 0,
   isSidePanelOpen: sidePanel,
   shortcutsDisabled: false,
-  isSettingsOpen: false,
-  isHomeOpen: false,
-  isVideoHidden: false,
   loop: false,
   recentlyPlayed: recent,
   openComponent: OpenComponent.None,
@@ -177,8 +172,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     if (fileList.length > 0) {
       set({
         currentFileList: fileList,
-        isSettingsOpen: false,
-        isVideoHidden: false,
+        openComponent: OpenComponent.Video,
         isPlaying: true,
         currentIndex: 0,
       });
@@ -189,8 +183,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     if (fileList.length > 0) {
       set({
         currentFileList: fileList,
-        isSettingsOpen: false,
-        isVideoHidden: false,
+        openComponent: OpenComponent.Video,
         isPlaying: true,
         currentIndex: 0,
       });
@@ -199,14 +192,10 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   toggleSettings: () => {
     if (get().openComponent === OpenComponent.Settings) {
       set(() => ({
-        isSettingsOpen: false,
-        isVideoHidden: false,
         openComponent: OpenComponent.None,
       }));
     } else {
       set(() => ({
-        isSettingsOpen: true,
-        isVideoHidden: true,
         openComponent: OpenComponent.Settings,
       }));
     }
@@ -214,20 +203,25 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   toggleHome: () => {
     if (get().openComponent === OpenComponent.Home) {
       set(() => ({
-        isHomeOpen: false,
-        isVideoHidden: false,
         openComponent: OpenComponent.None,
       }));
     } else {
       set(() => ({
-        isHomeOpen: true,
-        isVideoHidden: true,
         openComponent: OpenComponent.Home,
       }));
     }
   },
-  toggleVideoHidden: () =>
-    set((state) => ({ isVideoHidden: !state.isVideoHidden })),
+  toggleVideoHidden: () => {
+    if (get().openComponent === OpenComponent.Home) {
+      set(() => ({
+        openComponent: OpenComponent.None,
+      }));
+    } else {
+      set(() => ({
+        openComponent: OpenComponent.Home,
+      }));
+    }
+  },
   toggleLoop: () => set((state) => ({ loop: !state.loop })),
   addRecentlyPlayed: async (file) => {
     set((state) => {

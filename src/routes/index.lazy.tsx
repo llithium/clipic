@@ -62,7 +62,6 @@ function Index() {
     openFiles,
     shortcutsDisabled,
     toggleSettings,
-    isVideoHidden,
     loop,
     toggleLoop,
     recentlyPlayed,
@@ -114,7 +113,13 @@ function Index() {
     } else if (loop) {
       toggleLoop();
     }
-  }, []);
+  }, [
+    currentFileList.length,
+    loop,
+    toggleLoop,
+    updateCurrentFileList,
+    videoDuration,
+  ]);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
@@ -325,6 +330,22 @@ function Index() {
     shortcutsDisabled,
     currentVideo,
     toggleSettings,
+    currentIndex,
+    updateCurrentIndex,
+    keybinds.playPause,
+    keybinds.fullscreen,
+    keybinds.volumeUp,
+    keybinds.seekBackward,
+    keybinds.seekForward,
+    keybinds.longSeekBackward,
+    keybinds.longSeekForward,
+    keybinds.mute,
+    keybinds.openFiles,
+    keybinds.toggleSidePanel,
+    keybinds.toggleSettings,
+    keybinds.toggleHome,
+    toggleHome,
+    windowMovement,
   ]);
 
   useEffect(() => {
@@ -359,7 +380,11 @@ function Index() {
   return (
     <ResizablePanelGroup direction="horizontal">
       <ResizablePanel id="video" order={1}>
-        <div className={`w-full h-full ${isVideoHidden && "hidden"}`}>
+        <div
+          className={`w-full h-full ${
+            openComponent !== OpenComponent.Video && "hidden"
+          }`}
+        >
           <div
             ref={draggableRef}
             className={`relative w-full h-full z-10 select-none`}
@@ -371,7 +396,9 @@ function Index() {
               width={"100%"}
               height={"100%"}
               muted={isMuted}
-              playing={isVideoHidden ? false : isPlaying}
+              playing={
+                openComponent !== OpenComponent.Video ? false : isPlaying
+              }
               volume={currentVolume}
               progressInterval={50}
               onDuration={(duration) => updateVideoDuration(duration)}
@@ -394,7 +421,7 @@ function Index() {
       </ResizablePanel>
       <ResizableHandle
         className={`rounded-tl-lg bg-border/50 relative z-50 h-[calc(100vh-40px)] translate-y-10 ${
-          !isSidePanelOpen && "hidden"
+          (!isSidePanelOpen || currentFileList.length < 1) && "hidden"
         }`}
       />
       {openComponent === OpenComponent.Home && (
@@ -402,11 +429,12 @@ function Index() {
           recentlyPlayed={recentlyPlayed}
           updateCurrentFileList={updateCurrentFileList}
           updateOpenComponent={updateOpenComponent}
-          toggleVideoHiedden={toggleVideoHidden}
+          toggleVideoHidden={toggleVideoHidden}
+          updateIsPlaying={updateIsPlaying}
         />
       )}
       {openComponent === OpenComponent.Settings && <Settings />}
-      {!isVideoHidden && (
+      {openComponent === OpenComponent.Video && (
         <ResizablePanel
           id="sidebar"
           className={`flex flex-col justify-end transition-all ${
