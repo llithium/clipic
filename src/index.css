@@ -76,5 +76,5 @@ body {
   position: fixed;
   width: 100vw;
   height: 100vh;
-  scrollbar-color: hsl(var(--muted-foreground)) rgba(0, 0, 0, 0);
+  scrollbar-color: hsl(var(--border)) rgba(0, 0, 0, 0);
 }

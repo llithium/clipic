@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { OpenComponent, usePlayerStore } from "@/hooks/usePlayerStore";
 import { toggleFullscreen } from "@/lib/ui";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Minus, Square, X } from "lucide-react";
@@ -13,8 +13,7 @@ function TitleBar() {
     currentVideo,
     currentIndex,
     currentFileList,
-    isVideoHidden,
-    isSettingsOpen,
+    openComponent,
   } = usePlayerStore();
   const draggableRef = useRef<HTMLDivElement>(null);
 
@@ -39,7 +38,7 @@ function TitleBar() {
   return (
     <div
       className={`absolute top-0 flex justify-center items-center select-none w-full z-50 h-10 bg-gradient-to-b from-black/30 ${
-        isVideoHidden
+        openComponent !== OpenComponent.Video
           ? "bg-inherit"
           : currentFileList.length > 0
           ? "opacity-0"
@@ -49,7 +48,7 @@ function TitleBar() {
       <div>
         <h1
           className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${
-            isVideoHidden && "hidden"
+            openComponent !== OpenComponent.Video && "hidden"
           }`}
         >
           {currentVideo?.name}{" "}
@@ -58,7 +57,7 @@ function TitleBar() {
         </h1>
         <h1
           className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${
-            !isSettingsOpen && "hidden"
+            openComponent !== OpenComponent.Settings && "hidden"
           }`}
         >
           Settings

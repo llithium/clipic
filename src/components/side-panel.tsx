@@ -50,7 +50,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
     <DragDropContext onDragEnd={onDragEnd}>
       <ScrollArea
         ref={ref}
-        className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 py-2 pr-2 mr-1 flex flex-col gap-1 overflow-y-auto"
+        className="rounded-tl-sm h-[calc(100vh-32px)] relative z-40 pl-1 py-2 pr-3 flex flex-col gap-1 overflow-y-auto"
       >
         <Droppable droppableId="droppable-1">
           {(provided) => (
@@ -66,12 +66,12 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`draggable-item hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 ${
+                      className={`draggable-item hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 mb-1 rounded-lg ${
                         currentIndex === i && "bg-secondary"
                       }`}
                       onClick={() => updateCurrentIndex(i)}
                     >
-                      <div className="text-xs overflow-hidden overflow-ellipsis whitespace-nowrap">
+                      <div className="text-xs overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
                         <span>{i + 1}. </span> {video.fileName}
                       </div>
                     </div>

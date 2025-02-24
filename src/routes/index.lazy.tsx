@@ -11,11 +11,7 @@ import {
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { toggleFullscreen } from "@/lib/ui";
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from "@/components/ui/resizable";
+import { ResizablePanelGroup } from "@/components/ui/resizable";
 import PlayerControls from "@/components/player-controls";
 import SidePanel from "@/components/side-panel";
 import Settings from "@/components/ui/settings";
@@ -379,7 +375,11 @@ function Index() {
 
   return (
     <ResizablePanelGroup direction="horizontal">
-      <ResizablePanel id="video" order={1}>
+      <section
+        className={` ${
+          openComponent === OpenComponent.Video && "w-full h-full"
+        } transition-all`}
+      >
         <div
           className={`w-full h-full ${
             openComponent !== OpenComponent.Video && "hidden"
@@ -418,12 +418,7 @@ function Index() {
             ></div>
           </div>
         </div>
-      </ResizablePanel>
-      <ResizableHandle
-        className={`rounded-tl-lg bg-border/50 relative z-50 h-[calc(100vh-40px)] translate-y-10 ${
-          (!isSidePanelOpen || currentFileList.length < 1) && "hidden"
-        }`}
-      />
+      </section>
       {openComponent === OpenComponent.Home && (
         <Home
           recentlyPlayed={recentlyPlayed}
@@ -435,18 +430,13 @@ function Index() {
       )}
       {openComponent === OpenComponent.Settings && <Settings />}
       {openComponent === OpenComponent.Video && (
-        <ResizablePanel
-          id="sidebar"
+        <section
           className={`flex flex-col justify-end transition-all ${
-            !isSidePanelOpen && "invisible translate-x-40"
+            !isSidePanelOpen ? "invisible translate-x-80 w-0" : "w-[380px]"
           }`}
-          defaultSize={20}
-          minSize={20}
-          maxSize={isSidePanelOpen ? 25 : 0}
-          order={2}
         >
           <SidePanel ref={sidePanelRef} />
-        </ResizablePanel>
+        </section>
       )}
     </ResizablePanelGroup>
   );
