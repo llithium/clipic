@@ -48,6 +48,7 @@ function Index() {
     updateOpenComponent,
     toggleVideoHidden,
     toggleHome,
+    updateIsUiVisible,
   } = usePlayerStore();
   const { windowMovement, keybinds } = useSettingsStore();
 
@@ -240,6 +241,21 @@ function Index() {
         }
       }
     }
+    let mouseMoveTimeout: NodeJS.Timeout;
+    function handleMouseMove() {
+      document.body.style.cursor = "default";
+      updateIsUiVisible(true);
+
+      if (mouseMoveTimeout) {
+        clearTimeout(mouseMoveTimeout);
+      }
+
+      mouseMoveTimeout = setTimeout(() => {
+        updateIsUiVisible(false);
+        document.body.style.cursor = "none";
+      }, 3000);
+    }
+
     const draggable = draggableRef.current;
     const draggable2 = draggableRef2.current;
     const draggable3 = draggableRef3.current;
@@ -250,6 +266,7 @@ function Index() {
     draggable2?.addEventListener("mousedown", handleDrag);
     draggable3?.addEventListener("mousedown", handleDrag);
     window.addEventListener("mousedown", handleMouseDown);
+    window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
       unlisten.then((f) => f());
@@ -259,6 +276,10 @@ function Index() {
       draggable2?.removeEventListener("mousedown", handleDrag);
       draggable3?.removeEventListener("mousedown", handleDrag);
       window.removeEventListener("mousedown", handleMouseDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      if (mouseMoveTimeout) {
+        clearTimeout(mouseMoveTimeout);
+      }
     };
   }, [
     currentFileList,
@@ -289,6 +310,7 @@ function Index() {
     toggleSidePanel,
     updateCurrentFileList,
     updateCurrentIndex,
+    updateIsUiVisible,
     video,
     videoDuration,
     windowMovement,

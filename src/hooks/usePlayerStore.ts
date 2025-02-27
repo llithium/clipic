@@ -27,6 +27,7 @@ type State = {
   recentlyPlayed: SelectedFile[];
   openComponent: OpenComponent;
   previousComponent: OpenComponent;
+  isUiVisible: boolean;
 };
 
 type Actions = {
@@ -43,6 +44,7 @@ type Actions = {
   updateCurrentTooltipLeft: (state: number) => void;
   updateShortcutsDisabled: (state: boolean) => void;
   updateOpenComponent: (state: OpenComponent) => void;
+  updateIsUiVisible: (state: boolean) => void;
 
   playPause: () => void;
   nextVideo: () => void;
@@ -85,6 +87,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   recentlyPlayed: recent,
   openComponent: OpenComponent.Home,
   previousComponent: OpenComponent.None,
+  isUiVisible: true,
 
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
@@ -241,4 +244,5 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       openComponent: state,
     });
   },
+  updateIsUiVisible: (state) => set({ isUiVisible: state }),
 }));

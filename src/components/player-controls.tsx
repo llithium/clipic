@@ -39,6 +39,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     currentVideo,
     toggleLoop,
     loop,
+    isUiVisible,
   } = usePlayerStore();
   const { windowMovement } = useSettingsStore();
   function handleSeek(value: number[]) {
@@ -109,7 +110,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
   return (
     <div
       ref={draggableRef2}
-      className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 transition-opacity duration-700 ease-fast-out hover:opacity-100 ${
+      className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 ${
+        (isUiVisible || !isPlaying) && "opacity-100"
+      }  transition-opacity duration-700 ease-fast-out hover:opacity-100 ${
         !currentVideo?.name ? "hidden" : "flex"
       }`}
     >

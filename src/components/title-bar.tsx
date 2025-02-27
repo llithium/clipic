@@ -15,6 +15,8 @@ function TitleBar() {
     currentIndex,
     currentFileList,
     openComponent,
+    isUiVisible,
+    isPlaying,
   } = usePlayerStore();
   const draggableRef = useRef<HTMLDivElement>(null);
 
@@ -44,11 +46,13 @@ function TitleBar() {
           : currentFileList.length > 0
           ? "opacity-0"
           : "bg-inherit"
-      } transition-opacity duration-700 ease-fast-out hover:opacity-100 backdrop-blur-md`}
+      } ${
+        (isUiVisible || !isPlaying) && "opacity-100"
+      } transition-opacity duration-700 ease-fast-out backdrop-blur-md`}
     >
       <div>
         <h1
-          className={`text-md font-extrabold break-words tracking-tight lg:text-lg text-center dark:text-neutral-50 ${
+          className={`text-md font-extrabold break-words tracking-tight max-w-[70vw] overflow-ellipsis line-clamp-1 lg:text-lg text-center dark:text-neutral-50 ${
             openComponent !== OpenComponent.Video && "hidden"
           }`}
         >
