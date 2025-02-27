@@ -17,3 +17,4 @@ export const ACCEPTED_EXTENSIONS = [
   "aac",
   "flac",
 ];
+export const MAX_RECENTLY_PLAYED = 50;

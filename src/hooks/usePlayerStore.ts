@@ -1,3 +1,4 @@
+import { MAX_RECENTLY_PLAYED } from "@/lib/constants";
 import { getFiles } from "@/lib/files";
 import {
   SelectedFileList,
@@ -25,7 +26,9 @@ type State = {
   loop: boolean;
   recentlyPlayed: SelectedFile[];
   openComponent: OpenComponent;
+  previousComponent: OpenComponent;
 };
+
 type Actions = {
   updateCurrentFileList: (state: SelectedFileList) => void;
   updateCurrentVideo: (state: CurrentVideo) => void;
@@ -63,7 +66,6 @@ const volume: number = (await store.get("volume")) || 0.5;
 const sidePanel: boolean = (await store.get("side-panel")) || false;
 const muted: boolean = (await store.get("muted")) || false;
 const recent: SelectedFile[] = (await store.get("recent")) || [];
-const MAX_RECENTLY_PLAYED = 50;
 
 export const usePlayerStore = create<State & Actions>((set, get) => ({
   currentFileList: [],
@@ -81,7 +83,8 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   shortcutsDisabled: false,
   loop: false,
   recentlyPlayed: recent,
-  openComponent: OpenComponent.None,
+  openComponent: OpenComponent.Home,
+  previousComponent: OpenComponent.None,
 
   updateCurrentFileList: (state) => set({ currentFileList: state }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
@@ -176,37 +179,34 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     }
   },
   toggleSettings: () => {
-    if (get().openComponent === OpenComponent.Settings) {
-      set(() => ({
-        openComponent: OpenComponent.None,
-      }));
-    } else {
-      set(() => ({
-        openComponent: OpenComponent.Settings,
-      }));
-    }
+    const currentComponent = get().openComponent;
+    set(() => ({
+      openComponent:
+        currentComponent === OpenComponent.Settings
+          ? get().previousComponent
+          : OpenComponent.Settings,
+      previousComponent: currentComponent,
+    }));
   },
   toggleHome: () => {
-    if (get().openComponent === OpenComponent.Home) {
-      set(() => ({
-        openComponent: OpenComponent.None,
-      }));
-    } else {
-      set(() => ({
-        openComponent: OpenComponent.Home,
-      }));
-    }
+    const currentComponent = get().openComponent;
+    set(() => ({
+      openComponent:
+        currentComponent === OpenComponent.Home
+          ? get().previousComponent
+          : OpenComponent.Home,
+      previousComponent: currentComponent,
+    }));
   },
   toggleVideoHidden: () => {
-    if (get().openComponent === OpenComponent.Home) {
-      set(() => ({
-        openComponent: OpenComponent.None,
-      }));
-    } else {
-      set(() => ({
-        openComponent: OpenComponent.Home,
-      }));
-    }
+    const currentComponent = get().openComponent;
+    set(() => ({
+      openComponent:
+        currentComponent === OpenComponent.Home
+          ? get().previousComponent
+          : OpenComponent.Home,
+      previousComponent: currentComponent,
+    }));
   },
   toggleLoop: () => set((state) => ({ loop: !state.loop })),
   addRecentlyPlayed: async (file) => {
@@ -232,5 +232,11 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     await store.set("recent", get().recentlyPlayed);
     await store.save();
   },
-  updateOpenComponent: (state) => set({ openComponent: state }),
+  updateOpenComponent: (state) => {
+    const currentComponent = get().openComponent;
+    set({
+      previousComponent: currentComponent,
+      openComponent: state,
+    });
+  },
 }));

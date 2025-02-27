@@ -34,6 +34,7 @@ export const toFileList = async (
         filePath: file,
         fileExtension: await path.extname(file),
         thumbnailPath: null,
+        duration: null,
       };
     })
   );

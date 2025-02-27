@@ -3,8 +3,8 @@ export interface SelectedFile {
   fileName: string;
   filePath: string;
   fileExtension: string;
-  thumbnailPath?: string;
-  duration?: number;
+  thumbnailPath?: string | null;
+  duration?: number | null;
 }
 export interface CurrentVideo {
   name: string;
