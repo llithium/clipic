@@ -42,8 +42,6 @@ function Index() {
     openFiles,
     shortcutsDisabled,
     toggleSettings,
-    loop,
-    toggleLoop,
     recentlyPlayed,
     addRecentlyPlayed,
     openComponent,
@@ -64,26 +62,12 @@ function Index() {
   useEffect(() => {
     async function get_opened_file_args() {
       const files: SelectedFileList = await invoke("get_opened_file_args");
-      if (files) {
+      if (files.length > 0) {
         updateCurrentFileList(files);
       }
     }
     get_opened_file_args();
-
-    if (currentFileList.length === 1 && videoDuration <= 15) {
-      if (!loop) {
-        toggleLoop();
-      }
-    } else if (loop) {
-      toggleLoop();
-    }
-  }, [
-    currentFileList.length,
-    loop,
-    toggleLoop,
-    updateCurrentFileList,
-    videoDuration,
-  ]);
+  }, [updateCurrentFileList]);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
