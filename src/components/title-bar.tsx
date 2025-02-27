@@ -48,7 +48,7 @@ function TitleBar() {
           : "bg-inherit"
       } ${
         (isUiVisible || !isPlaying) && "opacity-100"
-      } transition-opacity duration-700 ease-fast-out backdrop-blur-md`}
+      } transition-opacity duration-700 ease-fast-out`}
     >
       <div>
         <h1
