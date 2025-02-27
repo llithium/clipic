@@ -1,8 +1,5 @@
-import {
-  OpenComponent,
-  SelectedFile,
-  SelectedFileList,
-} from "@/hooks/usePlayerStore";
+import { OpenComponent, SelectedFile, SelectedFileList } from "@/lib/types";
+import { formatDuration } from "@/lib/utils";
 import { convertFileSrc } from "@tauri-apps/api/core";
 
 function Home({
@@ -22,7 +19,7 @@ function Home({
       {recentlyPlayed.map((video, index) => (
         <div
           key={index}
-          className="mt-4 flex flex-col w-44 h-56 rounded-2xl cursor-pointer gap-1"
+          className="mt-4 flex flex-col w-44 h-60 rounded-2xl cursor-pointer gap-1"
           onClick={() => {
             updateCurrentFileList([recentlyPlayed[index]]);
             updateOpenComponent(OpenComponent.Video);
@@ -36,6 +33,9 @@ function Home({
           />
           <span className="font-semibold text-sm overflow-hidden text-ellipsis line-clamp-2">
             {video.fileName}
+          </span>
+          <span className="text-xs text-muted-foreground">
+            {formatDuration(video.duration || 0)}
           </span>
         </div>
       ))}

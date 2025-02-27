@@ -1,8 +1,9 @@
 import ReactPlayer from "react-player";
-import { OpenComponent, usePlayerStore } from "@/hooks/usePlayerStore";
+import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { OpenComponent } from "@/lib/types";
 import PlayerControls from "@/components/player-controls";
 
-interface onProgressProps {
+export interface onProgressProps {
   played: number;
   loaded: number;
   playedSeconds: number;

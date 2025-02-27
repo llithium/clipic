@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { OpenComponent, usePlayerStore } from "@/hooks/usePlayerStore";
-import { toggleFullscreen } from "@/lib/ui";
+import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { OpenComponent } from "@/lib/types";
+import { toggleFullscreen } from "@/lib/utils";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Minus, Square, X } from "lucide-react";
 import { getCurrentWindow } from "@tauri-apps/api/window";

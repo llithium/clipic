@@ -10,7 +10,7 @@ import {
   ContextMenuSubTrigger,
 } from "@/components/ui/context-menu";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { toggleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/utils";
 import {
   Dialog,
   DialogClose,

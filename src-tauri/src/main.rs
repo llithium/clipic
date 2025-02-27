@@ -26,6 +26,7 @@ struct File {
     file_path: PathBuf,
     file_extension: String,
     thumbnail_path: Option<PathBuf>,
+    duration: Option<u32>,
 }
 
 struct AppData {
@@ -62,6 +63,7 @@ fn main() {
                         .to_string_lossy()
                         .to_string(),
                     thumbnail_path: None,
+                    duration: None,
                 };
                 file_list.push(file);
                 app.manage(AppData {
@@ -113,6 +115,7 @@ async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>,
                     .to_string_lossy()
                     .to_string(),
                 thumbnail_path: None,
+                duration: None,
             };
             file_list.push(file)
         }
@@ -163,6 +166,7 @@ async fn generate_thumbnails(app: AppHandle, videos: Vec<File>) -> Result<Vec<Fi
                     file_path,
                     file_extension,
                     thumbnail_path: Some(output_path),
+                    duration: None,
                 });
             }
 
@@ -189,6 +193,7 @@ async fn generate_thumbnails(app: AppHandle, videos: Vec<File>) -> Result<Vec<Fi
                 file_path,
                 file_extension,
                 thumbnail_path: Some(output_path),
+                duration: None,
             })
         });
         join_handles.push(join_handle);

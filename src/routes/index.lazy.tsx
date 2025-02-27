@@ -2,23 +2,20 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
-import * as path from "@tauri-apps/api/path";
-import {
-  OpenComponent,
-  SelectedFileList,
-  usePlayerStore,
-} from "@/hooks/usePlayerStore";
+import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { OpenComponent, SelectedFileList } from "@/lib/types";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-import { toggleFullscreen } from "@/lib/ui";
+import { toggleFullscreen } from "@/lib/utils";
 import { ResizablePanelGroup } from "@/components/ui/resizable";
 import SidePanel from "@/components/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
-import { ACCEPTED_EXTENSIONS } from "@/lib/files";
 import { generateThumbnails } from "@/lib/utils";
 import Home from "@/components/home";
 import VideoPlayer from "@/components/video-player";
+import { ACCEPTED_EXTENSIONS } from "@/lib/constants";
+import { toFileList } from "@/lib/files";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
@@ -29,9 +26,7 @@ function Index() {
     currentFileList,
     currentVideo,
     currentIndex,
-    isPlaying,
     videoDuration,
-    currentVolume,
     updateCurrentFileList,
     updateCurrentVideo,
     updateCurrentIndex,
@@ -65,18 +60,6 @@ function Index() {
 
   const video = videoRef.current;
   const sidePanelRef = useRef<HTMLDivElement>(null);
-
-  const toFileList = async (array: string[]) => {
-    return await Promise.all(
-      array.map(async (file) => {
-        return {
-          fileName: await path.basename(file),
-          filePath: file,
-          fileExtension: await path.extname(file),
-        };
-      })
-    );
-  };
 
   useEffect(() => {
     async function get_opened_file_args() {
@@ -294,38 +277,36 @@ function Index() {
       window.removeEventListener("mousedown", handleMouseDown);
     };
   }, [
-    currentVolume,
-    updateCurrentFileList,
-    isPlaying,
-    videoDuration,
-    playPause,
-    increaseVolumeByStep,
-    decreaseVolumeByStep,
-    video,
-    toggleMute,
-    openFiles,
-    previousVideo,
-    nextVideo,
     currentFileList,
-    toggleSidePanel,
-    shortcutsDisabled,
-    currentVideo,
-    toggleSettings,
     currentIndex,
-    updateCurrentIndex,
-    keybinds.playPause,
+    currentVideo?.name,
+    decreaseVolumeByStep,
+    increaseVolumeByStep,
     keybinds.fullscreen,
-    keybinds.volumeUp,
-    keybinds.seekBackward,
-    keybinds.seekForward,
     keybinds.longSeekBackward,
     keybinds.longSeekForward,
     keybinds.mute,
     keybinds.openFiles,
-    keybinds.toggleSidePanel,
-    keybinds.toggleSettings,
+    keybinds.playPause,
+    keybinds.seekBackward,
+    keybinds.seekForward,
     keybinds.toggleHome,
+    keybinds.toggleSettings,
+    keybinds.toggleSidePanel,
+    keybinds.volumeUp,
+    nextVideo,
+    openFiles,
+    playPause,
+    previousVideo,
+    shortcutsDisabled,
     toggleHome,
+    toggleMute,
+    toggleSettings,
+    toggleSidePanel,
+    updateCurrentFileList,
+    updateCurrentIndex,
+    video,
+    videoDuration,
     windowMovement,
   ]);
 
@@ -337,14 +318,7 @@ function Index() {
         extension: currentFileList[currentIndex]?.fileExtension,
       });
     }
-  }, [
-    currentFileList,
-    currentIndex,
-    updateCurrentIndex,
-    updateCurrentVideo,
-    updateIsPlaying,
-    videoDuration,
-  ]);
+  }, [currentFileList, currentIndex, updateCurrentVideo]);
 
   useEffect(() => {
     async function recent() {
@@ -352,11 +326,12 @@ function Index() {
         const withThumbnail: SelectedFileList = (await generateThumbnails([
           currentFileList[currentIndex],
         ])) as SelectedFileList;
+        withThumbnail[0].duration = video?.getDuration();
         addRecentlyPlayed(withThumbnail[0]);
       }
     }
     recent();
-  }, [currentVideo, currentIndex, currentFileList, addRecentlyPlayed]);
+  }, [addRecentlyPlayed, currentFileList, currentIndex, video]);
 
   return (
     <ResizablePanelGroup direction="horizontal">

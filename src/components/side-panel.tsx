@@ -1,4 +1,5 @@
-import { SelectedFileList, usePlayerStore } from "@/hooks/usePlayerStore";
+import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { SelectedFileList } from "@/lib/types";
 import { ScrollArea } from "./ui/scroll-area";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useCallback, forwardRef } from "react";

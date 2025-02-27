@@ -1,26 +1,12 @@
 import { getFiles } from "@/lib/files";
+import {
+  SelectedFileList,
+  CurrentVideo,
+  SelectedFile,
+  OpenComponent,
+} from "@/lib/types";
 import { load } from "@tauri-apps/plugin-store";
 import { create } from "zustand";
-
-export type SelectedFileList = SelectedFile[];
-export interface SelectedFile {
-  fileName: string;
-  filePath: string;
-  fileExtension: string;
-  thumbnailPath?: string | null;
-}
-export interface CurrentVideo {
-  name: string;
-  url: string;
-  extension: string;
-}
-
-export enum OpenComponent {
-  None,
-  Home,
-  Settings,
-  Video,
-}
 
 type State = {
   currentFileList: SelectedFileList;

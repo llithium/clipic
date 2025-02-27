@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { toggleFullscreen } from "@/lib/ui";
+import { formatDuration, toggleFullscreen } from "@/lib/utils";
 import { Icon } from "@iconify/react";
 import { useEffect, useRef } from "react";
 import {
@@ -55,22 +55,6 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     } else {
       updateIsMuted(true);
     }
-  }
-
-  function formatDuration(seconds: number) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const secs = Math.floor(seconds % 60);
-
-    const formattedHours = hours.toString().padStart(1, "0");
-    const formattedMinutes = minutes
-      .toString()
-      .padStart(formattedHours !== "0" ? 2 : 1, "0");
-    const formattedSeconds = secs.toString().padStart(2, "0");
-
-    return `${formattedHours !== "0" ? formattedHours + ":" : ""}${
-      formattedMinutes + ":"
-    }${formattedSeconds}`;
   }
 
   function handleSliderMouseMove(

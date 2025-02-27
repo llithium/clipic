@@ -1,27 +1,8 @@
 import { open } from "@tauri-apps/plugin-dialog";
 import * as path from "@tauri-apps/api/path";
-import { SelectedFileList } from "@/hooks/usePlayerStore";
+import { SelectedFileList } from "./types";
 import { invoke } from "@tauri-apps/api/core";
-
-export const ACCEPTED_EXTENSIONS = [
-  "mp4",
-  "webm",
-  "ogg",
-  "mov",
-  "avi",
-  "mkv",
-  "m4v",
-  "flv",
-  "wmv",
-  "3gp",
-  "mpeg",
-  "mpg",
-  "mp3",
-  "wav",
-  "m4a",
-  "aac",
-  "flac",
-];
+import { ACCEPTED_EXTENSIONS } from "./constants";
 
 export async function getFiles(directory?: boolean): Promise<SelectedFileList> {
   const files =
@@ -43,7 +24,9 @@ export async function getFiles(directory?: boolean): Promise<SelectedFileList> {
   }
 }
 
-const toFileList = async (array: string[]): Promise<SelectedFileList> => {
+export const toFileList = async (
+  array: string[]
+): Promise<SelectedFileList> => {
   return await Promise.all(
     array.map(async (file) => {
       return {
