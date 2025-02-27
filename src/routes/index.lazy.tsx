@@ -301,8 +301,11 @@ function Index() {
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
         extension: currentFileList[currentIndex]?.fileExtension,
       });
+      if (currentFileList.length > 0) {
+        updateOpenComponent(OpenComponent.Video);
+      }
     }
-  }, [currentFileList, currentIndex, updateCurrentVideo]);
+  }, [currentFileList, currentIndex, updateCurrentVideo, updateOpenComponent]);
 
   useEffect(() => {
     async function recent() {
