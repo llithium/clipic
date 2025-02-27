@@ -26,7 +26,7 @@ struct File {
     file_path: PathBuf,
     file_extension: String,
     thumbnail_path: Option<PathBuf>,
-    duration: Option<u32>,
+    duration: Option<f32>,
 }
 
 struct AppData {
