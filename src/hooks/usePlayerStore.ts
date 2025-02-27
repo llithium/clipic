@@ -218,7 +218,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
         (item) => item.filePath === file.filePath
       );
 
-      if (alreadyInListIndex! - 1) {
+      if (alreadyInListIndex != -1) {
         state.recentlyPlayed.splice(alreadyInListIndex, 1);
       }
 
