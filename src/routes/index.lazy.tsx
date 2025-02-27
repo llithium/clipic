@@ -354,6 +354,7 @@ function Index() {
           updateOpenComponent={updateOpenComponent}
           toggleVideoHidden={toggleVideoHidden}
           updateIsPlaying={updateIsPlaying}
+          addRecentlyPlayed={addRecentlyPlayed}
         />
       )}
       {openComponent === OpenComponent.Settings && <Settings />}

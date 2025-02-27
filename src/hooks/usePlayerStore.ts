@@ -215,18 +215,20 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
         (item) => item !== null && item !== undefined
       );
 
-      const alreadyInList = validRecentlyPlayed.some(
+      const alreadyInListIndex = validRecentlyPlayed.findIndex(
         (item) => item.filePath === file.filePath
       );
 
-      if (alreadyInList) {
-        return { recentlyPlayed: validRecentlyPlayed };
+      if (alreadyInListIndex! - 1) {
+        validRecentlyPlayed.splice(alreadyInListIndex, 1);
       }
 
       const updatedList = [file, ...validRecentlyPlayed];
+
       if (updatedList.length > MAX_RECENTLY_PLAYED) {
         updatedList.pop();
       }
+
       return { recentlyPlayed: updatedList };
     });
     await store.set("recent", get().recentlyPlayed);
