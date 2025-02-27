@@ -214,19 +214,15 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   toggleLoop: () => set((state) => ({ loop: !state.loop })),
   addRecentlyPlayed: async (file) => {
     set((state) => {
-      const validRecentlyPlayed = state.recentlyPlayed.filter(
-        (item) => item !== null && item !== undefined
-      );
-
-      const alreadyInListIndex = validRecentlyPlayed.findIndex(
+      const alreadyInListIndex = state.recentlyPlayed.findIndex(
         (item) => item.filePath === file.filePath
       );
 
       if (alreadyInListIndex! - 1) {
-        validRecentlyPlayed.splice(alreadyInListIndex, 1);
+        state.recentlyPlayed.splice(alreadyInListIndex, 1);
       }
 
-      const updatedList = [file, ...validRecentlyPlayed];
+      const updatedList = [file, ...state.recentlyPlayed];
 
       if (updatedList.length > MAX_RECENTLY_PLAYED) {
         updatedList.pop();
