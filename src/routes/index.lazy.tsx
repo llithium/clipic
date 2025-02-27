@@ -12,24 +12,17 @@ import { getCurrentWebview } from "@tauri-apps/api/webview";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { toggleFullscreen } from "@/lib/ui";
 import { ResizablePanelGroup } from "@/components/ui/resizable";
-import PlayerControls from "@/components/player-controls";
 import SidePanel from "@/components/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
 import { ACCEPTED_EXTENSIONS } from "@/lib/files";
 import { generateThumbnails } from "@/lib/utils";
 import Home from "@/components/home";
+import VideoPlayer from "@/components/video-player";
 
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
-
-interface onProgressProps {
-  played: number;
-  loaded: number;
-  playedSeconds: number;
-  loadedSeconds: number;
-}
 
 function Index() {
   const {
@@ -39,14 +32,10 @@ function Index() {
     isPlaying,
     videoDuration,
     currentVolume,
-    isMuted,
     updateCurrentFileList,
     updateCurrentVideo,
     updateCurrentIndex,
     updateIsPlaying,
-    updateSliderValue,
-    updatePlayedSeconds,
-    updateVideoDuration,
     playPause,
     nextVideo,
     previousVideo,
@@ -89,10 +78,6 @@ function Index() {
     );
   };
 
-  function handleProgress(progress: onProgressProps) {
-    updateSliderValue([progress.played]);
-    updatePlayedSeconds(progress.playedSeconds);
-  }
   useEffect(() => {
     async function get_opened_file_args() {
       const files: SelectedFileList = await invoke("get_opened_file_args");
@@ -380,44 +365,12 @@ function Index() {
           openComponent === OpenComponent.Video && "w-full h-full"
         } transition-all`}
       >
-        <div
-          className={`w-full h-full ${
-            openComponent !== OpenComponent.Video && "hidden"
-          }`}
-        >
-          <div
-            ref={draggableRef}
-            className={`relative w-full h-full z-10 select-none`}
-          >
-            <PlayerControls video={video} />
-            <ReactPlayer
-              ref={videoRef}
-              style={{ position: "absolute" }}
-              width={"100%"}
-              height={"100%"}
-              muted={isMuted}
-              playing={
-                openComponent !== OpenComponent.Video ? false : isPlaying
-              }
-              volume={currentVolume}
-              progressInterval={50}
-              onDuration={(duration) => updateVideoDuration(duration)}
-              onProgress={(onProgressProps) => {
-                handleProgress(onProgressProps);
-              }}
-              onEnded={nextVideo}
-              url={currentVideo?.url}
-              loop={loop}
-            ></ReactPlayer>
-            <div
-              id="draggableRef2"
-              ref={draggableRef2}
-              className={`relative w-full h-full z-10 select-none ${
-                currentFileList.length === 0 && "cursor-pointer"
-              }`}
-            ></div>
-          </div>
-        </div>
+        <VideoPlayer
+          draggableRef={draggableRef}
+          draggableRef2={draggableRef2}
+          video={video}
+          videoRef={videoRef}
+        />
       </section>
       {openComponent === OpenComponent.Home && (
         <Home
