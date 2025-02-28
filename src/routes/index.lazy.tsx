@@ -138,7 +138,7 @@ function Index() {
         event.preventDefault();
         increaseVolumeByStep();
       }
-      if (event.key === keybinds.volumeUp) {
+      if (event.key === keybinds.volumeDown) {
         event.preventDefault();
         decreaseVolumeByStep();
       }
@@ -298,6 +298,7 @@ function Index() {
     keybinds.toggleHome,
     keybinds.toggleSettings,
     keybinds.toggleSidePanel,
+    keybinds.volumeDown,
     keybinds.volumeUp,
     nextVideo,
     openFiles,
