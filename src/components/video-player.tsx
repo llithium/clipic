@@ -11,11 +11,9 @@ export interface onProgressProps {
 }
 
 function VideoPlayer({
-  draggableRef,
   video,
   videoRef,
 }: {
-  draggableRef: React.RefObject<HTMLDivElement | null>;
   video: ReactPlayer | null;
   videoRef: React.RefObject<ReactPlayer | null>;
 }) {
@@ -27,10 +25,10 @@ function VideoPlayer({
     nextVideo,
     loop,
     currentVideo,
-    currentFileList,
     updateSliderValue,
     updatePlayedSeconds,
     updateVideoDuration,
+    playPause,
   } = usePlayerStore();
 
   function handleProgress(progress: onProgressProps) {
@@ -45,7 +43,7 @@ function VideoPlayer({
       }`}
     >
       <div
-        ref={draggableRef}
+        onClick={() => playPause()}
         className={`relative w-full h-full z-10 select-none`}
       >
         <PlayerControls video={video} />
@@ -66,12 +64,6 @@ function VideoPlayer({
           url={currentVideo?.url}
           loop={loop}
         ></ReactPlayer>
-        <div
-          id="draggableRef2"
-          className={`relative w-full h-full z-10 select-none ${
-            currentFileList.length === 0 && "cursor-pointer"
-          }`}
-        ></div>
       </div>
     </div>
   );

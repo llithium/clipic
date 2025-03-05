@@ -2,7 +2,6 @@ import { Button } from "@/components/ui/button";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
 import { formatDuration, toggleFullscreen } from "@/lib/utils";
 import { Icon } from "@iconify/react";
-import { useEffect, useRef } from "react";
 import {
   Tooltip,
   TooltipContent,
@@ -10,9 +9,7 @@ import {
   TooltipTrigger,
 } from "./ui/tooltip";
 import ReactPlayer from "react-player";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Slider } from "./ui/slider";
-import { useSettingsStore } from "@/hooks/useSettingsStore";
 
 const tooltipWidth = 80;
 
@@ -41,13 +38,9 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     loop,
     isUiVisible,
   } = usePlayerStore();
-  const { windowMovement } = useSettingsStore();
   function handleSeek(value: number[]) {
     video?.seekTo(value[0], "fraction");
   }
-
-  const draggableRef = useRef<HTMLDivElement>(null);
-  const draggableRef2 = useRef<HTMLDivElement>(null);
 
   function handleVolumeSlider(value: number[]) {
     updateCurrentVolume(value[0]);
@@ -82,34 +75,8 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     updateHoveredTime(hoveredTime || "0");
   }
 
-  useEffect(() => {
-    async function handleDrag(event: MouseEvent) {
-      if (windowMovement === "anywhere") {
-        if (event.target === event.currentTarget && event.buttons === 1) {
-          if (event.detail === 2) {
-            playPause();
-          } else if (!(await getCurrentWindow().isFullscreen())) {
-            await getCurrentWindow().startDragging();
-          }
-        }
-      }
-    }
-
-    const draggable = draggableRef.current;
-    const draggable2 = draggableRef2.current;
-
-    draggable?.addEventListener("mousedown", handleDrag);
-    draggable2?.addEventListener("mousedown", handleDrag);
-
-    return () => {
-      draggable?.removeEventListener("mousedown", handleDrag);
-      draggable2?.removeEventListener("mousedown", handleDrag);
-    };
-  }, [playPause, windowMovement]);
-
   return (
     <div
-      ref={draggableRef2}
       className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 ${
         (isUiVisible || !isPlaying) && "opacity-100"
       }  transition-opacity duration-700 ease-fast-out hover:opacity-100 ${
@@ -142,10 +109,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <div
-        ref={draggableRef}
-        className="flex items-center justify-between px-2 relative z-20"
-      >
+      <div className="flex items-center justify-between px-2 relative z-20">
         <div className="flex gap-2 items-center">
           {currentIndex > 0 ? (
             <Button

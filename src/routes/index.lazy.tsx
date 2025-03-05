@@ -311,11 +311,7 @@ function Index() {
           openComponent === OpenComponent.Video && "w-full h-full"
         } transition-all`}
       >
-        <VideoPlayer
-          draggableRef={draggableRef}
-          video={video}
-          videoRef={videoRef}
-        />
+        <VideoPlayer video={video} videoRef={videoRef} />
       </section>
       {openComponent === OpenComponent.Home && (
         <Home

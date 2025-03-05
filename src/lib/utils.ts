@@ -27,7 +27,12 @@ export async function toggleFullscreen() {
   if (await appWindow.isFullscreen()) {
     appWindow.setFullscreen(false);
   } else {
-    appWindow.setFullscreen(true);
+    if (await appWindow.isMaximized()) {
+      appWindow.unmaximize();
+      appWindow.setFullscreen(true);
+    } else {
+      appWindow.setFullscreen(true);
+    }
   }
 }
 
