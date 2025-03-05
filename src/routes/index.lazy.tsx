@@ -121,66 +121,66 @@ function Index() {
         return;
       }
 
-      if (event.code === keybinds.playPause || event.key === "k") {
+      if (keybinds.playPause.includes(event.key)) {
         event.preventDefault();
         playPause();
       }
 
-      if (event.key === keybinds.fullscreen) {
+      if (keybinds.fullscreen.includes(event.key)) {
         event.preventDefault();
         toggleFullscreen();
       }
 
-      if (event.key === keybinds.volumeUp) {
+      if (keybinds.volumeUp.includes(event.key)) {
         event.preventDefault();
         increaseVolumeByStep();
       }
-      if (event.key === keybinds.volumeDown) {
+      if (keybinds.volumeDown.includes(event.key)) {
         event.preventDefault();
         decreaseVolumeByStep();
       }
-      if (event.key === keybinds.seekBackward) {
+      if (keybinds.seekBackward.includes(event.key)) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.max(currentTime - 5, 0), "seconds");
       }
-      if (event.key === keybinds.seekForward) {
+      if (keybinds.seekForward.includes(event.key)) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
 
         video?.seekTo(Math.min(currentTime + 5, videoDuration), "seconds");
       }
-      if (event.key === keybinds.longSeekBackward) {
+      if (keybinds.longSeekBackward.includes(event.key)) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.max(currentTime - 30, 0), "seconds");
       }
-      if (event.key === keybinds.longSeekForward) {
+      if (keybinds.longSeekForward.includes(event.key)) {
         event.preventDefault();
         const currentTime = video?.getCurrentTime() || 0;
         video?.seekTo(Math.min(currentTime + 30, videoDuration), "seconds");
       }
 
-      if (event.key === keybinds.mute) {
+      if (keybinds.mute.includes(event.key)) {
         event.preventDefault();
         toggleMute();
       }
 
-      if (event.ctrlKey && event.key == keybinds.openFiles) {
+      if (event.ctrlKey && keybinds.openFiles.includes(event.key)) {
         event.preventDefault();
         openFiles();
       }
 
-      if (event.ctrlKey && event.key == keybinds.toggleSidePanel) {
+      if (event.ctrlKey && keybinds.toggleSidePanel.includes(event.key)) {
         event.preventDefault();
         toggleSidePanel();
       }
 
-      if (event.ctrlKey && event.key == keybinds.toggleSettings) {
+      if (event.ctrlKey && keybinds.toggleSettings.includes(event.key)) {
         event.preventDefault();
         toggleSettings();
       }
-      if (event.ctrlKey && event.key == keybinds.toggleHome) {
+      if (event.ctrlKey && keybinds.toggleHome.includes(event.key)) {
         event.preventDefault();
         toggleHome();
       }
