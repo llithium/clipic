@@ -2,6 +2,7 @@ import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
 import { OpenComponent } from "@/lib/types";
 import PlayerControls from "@/components/player-controls";
+import { MouseEvent } from "react";
 
 export interface onProgressProps {
   played: number;
@@ -35,7 +36,11 @@ function VideoPlayer({
     updateSliderValue([progress.played]);
     updatePlayedSeconds(progress.playedSeconds);
   }
-
+  function handleClick(event: MouseEvent<HTMLDivElement>) {
+    if (event.target == videoRef.current?.getInternalPlayer()) {
+      playPause();
+    }
+  }
   return (
     <div
       className={`w-full h-full ${
@@ -43,7 +48,8 @@ function VideoPlayer({
       }`}
     >
       <div
-        onClick={() => playPause()}
+        id="click-handler"
+        onClick={handleClick}
         className={`relative w-full h-full z-10 select-none`}
       >
         <PlayerControls video={video} />
