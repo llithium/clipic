@@ -23,24 +23,20 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Theme } from "@tauri-apps/api/window";
-import { useSettingsStore } from "@/hooks/useSettingsStore";
 
 const formSchema = z.object({
   theme: z.string(),
-  windowMovement: z.string(),
 });
 
 function Settings() {
   const { theme, setTheme } = useTheme();
   const { toggleSettings } = usePlayerStore();
-  const { windowMovement, updateWindowMovement } = useSettingsStore();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       theme: theme,
-      windowMovement: windowMovement,
     },
   });
 
@@ -49,7 +45,6 @@ function Settings() {
     // Do something with the form values.
     // ✅ This will be type-safe and validated.
     setTheme(values.theme as Theme);
-    updateWindowMovement(values.windowMovement);
   }
 
   return (
@@ -79,36 +74,6 @@ function Settings() {
                       <SelectItem value="system">System</SelectItem>
                       <SelectItem value="dark">Dark</SelectItem>
                       <SelectItem value="light">Light</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  {/* <FormDescription>
-                </FormDescription> */}
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="windowMovement"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Window Movement</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    defaultValue={field.value}
-                  >
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select method for moving the window" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="titleBar">Title bar only</SelectItem>
-                      <SelectItem value="anywhere">
-                        {
-                          "Click and drag anywhere (double-click for play/pause)"
-                        }
-                      </SelectItem>
                     </SelectContent>
                   </Select>
                   {/* <FormDescription>

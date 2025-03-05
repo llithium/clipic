@@ -4,13 +4,10 @@ import { OpenComponent } from "@/lib/types";
 import { toggleFullscreen } from "@/lib/utils";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { Minus, Square, X } from "lucide-react";
-import { getCurrentWindow } from "@tauri-apps/api/window";
-import { useEffect, useRef } from "react";
 const appWindow = getCurrentWebviewWindow();
 
 function TitleBar() {
   const {
-    playPause,
     currentVideo,
     currentIndex,
     currentFileList,
@@ -18,28 +15,10 @@ function TitleBar() {
     isUiVisible,
     isPlaying,
   } = usePlayerStore();
-  const draggableRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const draggable = draggableRef.current;
-
-    async function handleDrag(event: MouseEvent) {
-      if (event.target === event.currentTarget && event.buttons === 1) {
-        if (event.detail === 2) {
-          playPause();
-        } else if (!(await appWindow.isFullscreen())) {
-          await getCurrentWindow().startDragging();
-        }
-      }
-    }
-    draggable?.addEventListener("mousedown", handleDrag);
-    return () => {
-      draggable?.removeEventListener("mousedown", handleDrag);
-    };
-  }, [playPause]);
 
   return (
     <div
+      data-tauri-drag-region
       className={`absolute top-0 flex justify-center items-center select-none w-full z-50 h-10 bg-gradient-to-b from-black/30 ${
         openComponent !== OpenComponent.Video
           ? "bg-inherit"
@@ -50,7 +29,7 @@ function TitleBar() {
         (isUiVisible || !isPlaying) && "opacity-100"
       } transition-opacity duration-700 ease-fast-out`}
     >
-      <div>
+      <div data-tauri-drag-region>
         <h1
           className={`text-md font-extrabold break-words tracking-tight max-w-[70vw] overflow-ellipsis line-clamp-1 lg:text-lg text-center dark:text-neutral-50 ${
             openComponent !== OpenComponent.Video && "hidden"
@@ -69,7 +48,7 @@ function TitleBar() {
         </h1>
       </div>
       <div
-        ref={draggableRef}
+        data-tauri-drag-region
         className={`absolute flex top-0 justify-end w-full items-center`}
       >
         <Button

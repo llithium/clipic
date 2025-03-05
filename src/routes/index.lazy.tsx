@@ -5,7 +5,6 @@ import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
 import { OpenComponent, SelectedFileList } from "@/lib/types";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
-import { getCurrentWindow } from "@tauri-apps/api/window";
 import { toggleFullscreen } from "@/lib/utils";
 import { ResizablePanelGroup } from "@/components/ui/resizable";
 import SidePanel from "@/components/side-panel";
@@ -50,12 +49,10 @@ function Index() {
     toggleHome,
     updateIsUiVisible,
   } = usePlayerStore();
-  const { windowMovement, keybinds } = useSettingsStore();
+  const { keybinds } = useSettingsStore();
 
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
-  const draggableRef2 = useRef<HTMLDivElement>(null);
-  const draggableRef3 = useRef<HTMLDivElement>(null);
 
   const video = videoRef.current;
   const sidePanelRef = useRef<HTMLDivElement>(null);
@@ -206,41 +203,12 @@ function Index() {
       }
     }
 
-    async function handleDrag(event: MouseEvent) {
-      if (windowMovement === "anywhere") {
-        if (event.target === event.currentTarget && event.buttons === 1) {
-          if (event.detail === 2) {
-            playPause();
-          } else if (!(await getCurrentWindow().isFullscreen())) {
-            await getCurrentWindow().startDragging();
-          }
-        }
-      }
-    }
     async function handleDragMain(event: MouseEvent) {
-      if (windowMovement === "anywhere") {
-        if (currentFileList.length > 0) {
-          if (event.target === event.currentTarget && event.buttons === 1) {
-            if (event.detail === 2) {
-              playPause();
-            } else if (!(await getCurrentWindow().isFullscreen())) {
-              await getCurrentWindow().startDragging();
-            }
-          }
-        } else if (event.button === 0 && !currentVideo?.name) {
-          openFiles();
-        }
-      } else {
-        if (currentFileList.length > 0) {
-          const target = event.target as HTMLDivElement;
-          if (target.id === "draggableRef2" && event.buttons === 1) {
-            playPause();
-          }
-        } else if (event.button === 0 && !currentVideo?.name) {
-          openFiles();
-        }
+      if (event.button === 0 && !currentVideo?.name) {
+        openFiles();
       }
     }
+
     let mouseMoveTimeout: NodeJS.Timeout;
     function handleMouseMove() {
       document.body.style.cursor = "default";
@@ -257,14 +225,10 @@ function Index() {
     }
 
     const draggable = draggableRef.current;
-    const draggable2 = draggableRef2.current;
-    const draggable3 = draggableRef3.current;
 
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("wheel", handleScroll);
     draggable?.addEventListener("mousedown", handleDragMain);
-    draggable2?.addEventListener("mousedown", handleDrag);
-    draggable3?.addEventListener("mousedown", handleDrag);
     window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
 
@@ -273,8 +237,6 @@ function Index() {
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("wheel", handleScroll);
       draggable?.removeEventListener("mousedown", handleDragMain);
-      draggable2?.removeEventListener("mousedown", handleDrag);
-      draggable3?.removeEventListener("mousedown", handleDrag);
       window.removeEventListener("mousedown", handleMouseDown);
       document.removeEventListener("mousemove", handleMouseMove);
       if (mouseMoveTimeout) {
@@ -314,7 +276,6 @@ function Index() {
     updateIsUiVisible,
     video,
     videoDuration,
-    windowMovement,
   ]);
 
   useEffect(() => {
@@ -352,7 +313,6 @@ function Index() {
       >
         <VideoPlayer
           draggableRef={draggableRef}
-          draggableRef2={draggableRef2}
           video={video}
           videoRef={videoRef}
         />

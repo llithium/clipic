@@ -16,17 +16,14 @@ interface Keybinds {
   toggleHome: string;
 }
 type State = {
-  windowMovement: string;
   keybinds: Keybinds;
 };
 type Actions = {
-  updateWindowMovement: (state: string) => void;
   updateKeybinds: (state: Keybinds) => void;
 };
 
 const store = await load("store.json");
-const windowMovement: string =
-  (await store.get("window-movement")) || "titleBar";
+
 const keybinds: Keybinds = (await store.get("keybinds")) || {
   playPause: "Space",
   fullscreen: "Enter",
@@ -44,13 +41,7 @@ const keybinds: Keybinds = (await store.get("keybinds")) || {
 };
 
 export const useSettingsStore = create<State & Actions>((set) => ({
-  windowMovement: windowMovement,
   keybinds: keybinds,
-  updateWindowMovement: async (state) => {
-    set({ windowMovement: state });
-    await store.set("window-movement", state);
-    await store.save();
-  },
   updateKeybinds: async (state) => {
     set({ keybinds: state });
     await store.set("keybinds", state);
