@@ -129,6 +129,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       isMuted: false,
     }));
     await store.set("volume", get().currentVolume);
+    await store.set("muted", get().isMuted);
     await store.save();
   },
   decreaseVolumeByStep: async () => {
@@ -140,6 +141,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       }
     });
     await store.set("volume", get().currentVolume);
+    await store.set("muted", get().isMuted);
     await store.save();
   },
   toggleSidePanel: async () => {
