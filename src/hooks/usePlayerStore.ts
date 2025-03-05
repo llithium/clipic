@@ -67,6 +67,7 @@ const store = await load("store.json", { autoSave: false });
 const volume: number = (await store.get("volume")) || 0.5;
 const sidePanel: boolean = (await store.get("side-panel")) || false;
 const muted: boolean = (await store.get("muted")) || false;
+const loop: boolean = (await store.get("loop")) || false;
 const recent: SelectedFile[] = (await store.get("recent")) || [];
 
 export const usePlayerStore = create<State & Actions>((set, get) => ({
@@ -83,7 +84,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   currentTooltipLeft: 0,
   isSidePanelOpen: sidePanel,
   shortcutsDisabled: false,
-  loop: false,
+  loop: loop,
   recentlyPlayed: recent,
   openComponent: OpenComponent.Home,
   previousComponent: OpenComponent.None,
@@ -211,7 +212,11 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       previousComponent: currentComponent,
     }));
   },
-  toggleLoop: () => set((state) => ({ loop: !state.loop })),
+  toggleLoop: async () => {
+    set((state) => ({ loop: !state.loop }));
+    await store.set("loop", get().loop);
+    await store.save();
+  },
   addRecentlyPlayed: async (file) => {
     set((state) => {
       const alreadyInListIndex = state.recentlyPlayed.findIndex(
