@@ -12,6 +12,7 @@ use anyhow::anyhow;
 use serde::{Deserialize, Serialize};
 use tauri::{AppHandle, Manager};
 use tokio::task::{self, JoinHandle};
+use walkdir::WalkDir;
 
 const EXTENSIONS: [&str; 17] = [
     "mp4", "webm", "ogg", "mov", "avi", "mkv", "m4v", "flv", "wmv", "3gp", "mpeg", "mpg", "mp3",
@@ -69,6 +70,10 @@ fn main() {
                 app.manage(AppData {
                     opened_file_args: Some(file_list),
                 });
+            } else {
+                app.manage(AppData {
+                    opened_file_args: None,
+                });
             }
 
             Ok(())
@@ -79,34 +84,31 @@ fn main() {
 
 #[tauri::command]
 async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>, ()> {
-    let mut file_list = vec![];
+    let mut file_list = Vec::new();
     for dir in directories {
-        let entries = if let Ok(entries) = read_dir(dir) {
-            entries
-        } else {
-            return Err(());
-        };
-        for entry in entries {
-            let entry = if let Ok(entry) = entry {
-                entry
-            } else {
-                return Err(());
-            };
+        get_files(dir, &mut file_list);
+    }
+    Ok(file_list)
+}
 
-            if !EXTENSIONS.contains(
-                &entry
-                    .path()
-                    .extension()
-                    .unwrap_or_default()
-                    .to_str()
-                    .unwrap_or_default(),
-            ) {
-                break;
-            };
+fn get_files(directory: PathBuf, file_list: &mut Vec<File>) {
+    let walker = WalkDir::new(directory).max_depth(1).into_iter();
+    for entry in walker.filter_map(|e| e.ok()) {
+        if entry.file_type().is_dir() {
+            continue;
+        }
 
+        if EXTENSIONS.contains(
+            &entry
+                .path()
+                .extension()
+                .unwrap_or_default()
+                .to_str()
+                .unwrap_or_default(),
+        ) {
             let file = File {
-                file_name: entry.file_name().into_string().unwrap_or_default(),
-                file_path: entry.path(),
+                file_name: entry.file_name().to_str().unwrap_or_default().to_owned(),
+                file_path: entry.path().to_path_buf(),
                 file_extension: entry
                     .path()
                     .extension()
@@ -117,10 +119,9 @@ async fn read_opened_directories(directories: Vec<PathBuf>) -> Result<Vec<File>,
                 thumbnail_path: None,
                 duration: None,
             };
-            file_list.push(file)
+            file_list.push(file);
         }
     }
-    Ok(file_list)
 }
 
 #[tauri::command]

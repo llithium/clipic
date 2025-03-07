@@ -170,7 +170,10 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
 
           <TooltipProvider delayDuration={200}>
             <Tooltip>
-              <TooltipTrigger className="flex items-center justify-center">
+              <TooltipTrigger
+                asChild
+                className="flex items-center justify-center"
+              >
                 <Button
                   size="icon"
                   variant={"icon"}

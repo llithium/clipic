@@ -23,6 +23,7 @@ tauri-plugin-dialog = "2.2.0"
 tauri-plugin-store = "2.2.0"
 anyhow = "1.0.95"
 tokio = { version = "1.29.1", features = ["full"] }
+walkdir = "2.5.0"
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem and the built-in dev server is disabled.

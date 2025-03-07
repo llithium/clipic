@@ -60,7 +60,7 @@ function Index() {
   useEffect(() => {
     async function get_opened_file_args() {
       const files: SelectedFileList = await invoke("get_opened_file_args");
-      if (files.length > 0) {
+      if (files) {
         updateCurrentFileList(files);
       }
     }
@@ -302,7 +302,7 @@ function Index() {
       }
     }
     recent();
-  }, [addRecentlyPlayed, currentFileList, currentIndex, video]);
+  }, [addRecentlyPlayed, currentFileList, currentIndex, video, currentVideo]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
