@@ -3,6 +3,7 @@ import { SelectedFileList } from "@/lib/types";
 import { ScrollArea } from "./ui/scroll-area";
 import { DragDropContext, Draggable, Droppable } from "@hello-pangea/dnd";
 import { useCallback, forwardRef } from "react";
+import { CircleMinus } from "lucide-react";
 
 type SidePanelProps = object;
 
@@ -72,8 +73,24 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                       }`}
                       onClick={() => updateCurrentIndex(i)}
                     >
-                      <div className="text-xs overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
-                        <span>{i + 1}. </span> {video.fileName}
+                      <div className="text-xs relative group overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
+                        <span className="group-hover:opacity-40">
+                          {i + 1}. {video.fileName}
+                        </span>
+                        <button
+                          className="w-4 h-full absolute right-0 top-0 bottom-0"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateCurrentFileList(
+                              currentFileList.filter((_, index) => index !== i)
+                            );
+                          }}
+                        >
+                          <CircleMinus
+                            size={15}
+                            className="text-accent-foreground opacity-0 group-hover:opacity-100 transition-opacity  "
+                          />
+                        </button>
                       </div>
                     </div>
                   )}
