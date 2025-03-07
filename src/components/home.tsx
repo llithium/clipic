@@ -10,6 +10,7 @@ function Home({
   updateOpenComponent,
   updateIsPlaying,
   addRecentlyPlayed,
+  updateCurrentIndex,
 }: {
   recentlyPlayed: SelectedFile[];
   updateCurrentFileList: (state: SelectedFileList) => void;
@@ -17,6 +18,7 @@ function Home({
   toggleVideoHidden: () => void;
   updateIsPlaying: (state: boolean) => void;
   addRecentlyPlayed: (file: SelectedFile) => void;
+  updateCurrentIndex: (state: number) => void;
 }) {
   const { openFiles, toggleSettings } = usePlayerStore();
   return (
@@ -42,6 +44,8 @@ function Home({
             className="mt-4 flex hover:bg-foreground/5 flex-col w-44 p-1 h-60 rounded-lg cursor-pointer gap-1"
             onClick={() => {
               updateCurrentFileList([recentlyPlayed[index]]);
+
+              updateCurrentIndex(0);
               addRecentlyPlayed(recentlyPlayed[index]);
               updateOpenComponent(OpenComponent.Video);
               updateIsPlaying(true);

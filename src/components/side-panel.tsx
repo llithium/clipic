@@ -68,12 +68,12 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
-                      className={`draggable-item hover:bg-accent cursor-pointer active:opacity-60 transition-all px-2 py-2 mb-1 rounded-lg ${
+                      className={`draggable-item hover:bg-accent group cursor-pointer active:opacity-60 transition-all px-2 py-2 mb-1 rounded-lg ${
                         currentIndex === i && "bg-secondary"
                       }`}
                       onClick={() => updateCurrentIndex(i)}
                     >
-                      <div className="text-xs relative group overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
+                      <div className="text-xs relative overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
                         <span className="group-hover:opacity-40">
                           {i + 1}. {video.fileName}
                         </span>

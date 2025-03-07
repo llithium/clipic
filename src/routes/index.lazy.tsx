@@ -19,6 +19,7 @@ import { toFileList } from "@/lib/files";
 export const Route = createLazyFileRoute("/")({
   component: Index,
 });
+let mouseMoveTimeout: NodeJS.Timeout;
 
 function Index() {
   const {
@@ -97,9 +98,7 @@ function Index() {
           const newIndex = updatedFileList.findIndex(
             (video) => video.filePath === currentVideoPath
           );
-
-          updateCurrentFileList(updatedFileList);
-          updateCurrentIndex(newIndex);
+          updateFileListAndIndex(updatedFileList, newIndex);
         } else {
           updateCurrentFileList(fileList);
         }
@@ -203,9 +202,35 @@ function Index() {
         openFiles();
       }
     }
+    const draggable = draggableRef.current;
 
-    let mouseMoveTimeout: NodeJS.Timeout;
-    function handleMouseMove() {
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("wheel", handleScroll);
+    draggable?.addEventListener("mousedown", handleDragMain);
+    window.addEventListener("mousedown", handleMouseDown);
+
+    return () => {
+      unlisten.then((f) => f());
+      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener("wheel", handleScroll);
+      draggable?.removeEventListener("mousedown", handleDragMain);
+      window.removeEventListener("mousedown", handleMouseDown);
+      if (mouseMoveTimeout) {
+        clearTimeout(mouseMoveTimeout);
+      }
+    };
+  }, []);
+
+  const updateFileListAndIndex = useCallback(
+    (files: SelectedFileList, index: number) => {
+      updateCurrentFileList(files);
+      updateCurrentIndex(index);
+    },
+    [updateCurrentFileList, updateCurrentIndex]
+  );
+
+  useEffect(() => {
+    const handleMouseMove = () => {
       document.body.style.cursor = "default";
       updateIsUiVisible(true);
 
@@ -217,69 +242,17 @@ function Index() {
         updateIsUiVisible(false);
         document.body.style.cursor = "none";
       }, 3000);
-    }
+    };
 
-    const draggable = draggableRef.current;
-
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("wheel", handleScroll);
-    draggable?.addEventListener("mousedown", handleDragMain);
-    window.addEventListener("mousedown", handleMouseDown);
     window.addEventListener("mousemove", handleMouseMove);
 
     return () => {
-      unlisten.then((f) => f());
-      window.removeEventListener("keydown", handleKeyDown);
-      window.removeEventListener("wheel", handleScroll);
-      draggable?.removeEventListener("mousedown", handleDragMain);
-      window.removeEventListener("mousedown", handleMouseDown);
-      document.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mousemove", handleMouseMove);
       if (mouseMoveTimeout) {
         clearTimeout(mouseMoveTimeout);
       }
     };
-  }, [
-    currentFileList,
-    currentIndex,
-    currentVideo?.name,
-    decreaseVolumeByStep,
-    increaseVolumeByStep,
-    keybinds.fullscreen,
-    keybinds.longSeekBackward,
-    keybinds.longSeekForward,
-    keybinds.mute,
-    keybinds.openFiles,
-    keybinds.playPause,
-    keybinds.seekBackward,
-    keybinds.seekForward,
-    keybinds.toggleHome,
-    keybinds.toggleSettings,
-    keybinds.toggleSidePanel,
-    keybinds.volumeDown,
-    keybinds.volumeUp,
-    nextVideo,
-    openFiles,
-    playPause,
-    previousVideo,
-    shortcutsDisabled,
-    toggleHome,
-    toggleMute,
-    toggleSettings,
-    toggleSidePanel,
-    updateCurrentFileList,
-    updateCurrentIndex,
-    updateIsUiVisible,
-    video,
-    videoDuration,
-  ]);
-
-  const updateFileListAndIndex = useCallback(
-    (files: SelectedFileList, index: number) => {
-      updateCurrentFileList(files);
-      updateCurrentIndex(index);
-    },
-    [updateCurrentFileList, updateCurrentIndex]
-  );
+  }, [updateIsUiVisible]);
 
   useEffect(() => {
     async function get_opened_file_args() {
@@ -296,8 +269,8 @@ function Index() {
     get_opened_file_args();
   }, [updateFileListAndIndex]);
 
-  useEffect(() => {
-    if (currentFileList && currentFileList[currentIndex]) {
+  const updateOnVideoChange = useCallback(async () => {
+    if (currentFileList) {
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
@@ -306,21 +279,17 @@ function Index() {
       if (currentFileList.length > 0) {
         updateOpenComponent(OpenComponent.Video);
       }
+      const withThumbnail: SelectedFileList = (await generateThumbnails([
+        currentFileList[currentIndex],
+      ])) as SelectedFileList;
+      withThumbnail[0].duration = video?.getDuration();
+      addRecentlyPlayed(withThumbnail[0]);
     }
-  }, [currentFileList, currentIndex, updateCurrentVideo, updateOpenComponent]);
+  }, [currentFileList, currentIndex]);
 
   useEffect(() => {
-    async function recent() {
-      if (currentFileList && currentFileList[currentIndex]) {
-        const withThumbnail: SelectedFileList = (await generateThumbnails([
-          currentFileList[currentIndex],
-        ])) as SelectedFileList;
-        withThumbnail[0].duration = video?.getDuration();
-        addRecentlyPlayed(withThumbnail[0]);
-      }
-    }
-    recent();
-  }, [addRecentlyPlayed, currentFileList, currentIndex, video]);
+    updateOnVideoChange();
+  }, [updateOnVideoChange]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
@@ -339,6 +308,7 @@ function Index() {
           toggleVideoHidden={toggleVideoHidden}
           updateIsPlaying={updateIsPlaying}
           addRecentlyPlayed={addRecentlyPlayed}
+          updateCurrentIndex={updateCurrentIndex}
         />
       )}
       {openComponent === OpenComponent.Settings && <Settings />}
