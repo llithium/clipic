@@ -59,13 +59,16 @@ function Index() {
 
   useEffect(() => {
     async function get_opened_file_args() {
-      const files: SelectedFileList = await invoke("get_opened_file_args");
+      const files: [SelectedFileList, string] = await invoke(
+        "get_opened_file_args"
+      );
       if (files) {
-        updateCurrentFileList(files);
+        updateCurrentFileList(files[0]);
+        updateCurrentIndex(files[0].findIndex((f) => f.filePath == files[1]));
       }
     }
     get_opened_file_args();
-  }, [updateCurrentFileList]);
+  }, [updateCurrentFileList, updateCurrentIndex]);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {

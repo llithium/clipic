@@ -31,7 +31,7 @@ struct File {
 }
 
 struct AppData {
-    opened_file_args: Option<Vec<File>>,
+    opened_file_args: Option<(Vec<File>, PathBuf)>,
 }
 
 fn main() {
@@ -45,30 +45,35 @@ fn main() {
         ])
         .setup(|app| {
             let args: Vec<String> = std::env::args().collect();
-            let mut file_list: Vec<File> = vec![];
 
             if args.len() > 1 {
-                let file_path = PathBuf::from(&args[1]);
-                let file = File {
-                    file_name: file_path
-                        .file_name()
-                        .unwrap_or_default()
-                        .to_owned()
-                        .into_string()
-                        .unwrap_or_default(),
-                    file_path: file_path.clone(),
-                    file_extension: file_path
-                        .extension()
-                        .unwrap_or_default()
-                        .to_owned()
-                        .to_string_lossy()
-                        .to_string(),
-                    thumbnail_path: None,
-                    duration: None,
+                let mut file_list: Vec<File> = Vec::new();
+                let file_path = standardize_path_slash(&args[1]);
+
+                if let Some(dir) = file_path.parent() {
+                    get_files(dir.to_path_buf(), &mut file_list);
                 };
-                file_list.push(file);
+
+                // let file = File {
+                //     file_name: file_path
+                //         .file_name()
+                //         .unwrap_or_default()
+                //         .to_owned()
+                //         .into_string()
+                //         .unwrap_or_default(),
+                //     file_path: file_path.clone(),
+                //     file_extension: file_path
+                //         .extension()
+                //         .unwrap_or_default()
+                //         .to_owned()
+                //         .to_string_lossy()
+                //         .to_string(),
+                //     thumbnail_path: None,
+                //     duration: None,
+                // };
+                // file_list.push(file);
                 app.manage(AppData {
-                    opened_file_args: Some(file_list),
+                    opened_file_args: Some((file_list, file_path)),
                 });
             } else {
                 app.manage(AppData {
@@ -80,6 +85,10 @@ fn main() {
         })
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn standardize_path_slash(path: &str) -> PathBuf {
+    path.replace("\\", "/").into()
 }
 
 #[tauri::command]
@@ -108,7 +117,7 @@ fn get_files(directory: PathBuf, file_list: &mut Vec<File>) {
         ) {
             let file = File {
                 file_name: entry.file_name().to_str().unwrap_or_default().to_owned(),
-                file_path: entry.path().to_path_buf(),
+                file_path: standardize_path_slash(entry.path().to_str().unwrap_or_default()),
                 file_extension: entry
                     .path()
                     .extension()
@@ -125,9 +134,11 @@ fn get_files(directory: PathBuf, file_list: &mut Vec<File>) {
 }
 
 #[tauri::command]
-async fn get_opened_file_args(app: AppHandle) -> Option<Vec<File>> {
+async fn get_opened_file_args(app: AppHandle) -> Option<(Vec<File>, PathBuf)> {
     let data = app.state::<AppData>();
-    data.opened_file_args.as_ref().map(|files| files.to_vec())
+    data.opened_file_args
+        .as_ref()
+        .map(|files| (files.0.to_vec(), files.1.clone()))
 }
 
 #[tauri::command]
