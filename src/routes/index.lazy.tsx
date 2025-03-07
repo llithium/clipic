@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 import { convertFileSrc, invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
@@ -56,19 +56,6 @@ function Index() {
 
   const video = videoRef.current;
   const sidePanelRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    async function get_opened_file_args() {
-      const files: [SelectedFileList, string] = await invoke(
-        "get_opened_file_args"
-      );
-      if (files) {
-        updateCurrentFileList(files[0]);
-        updateCurrentIndex(files[0].findIndex((f) => f.filePath == files[1]));
-      }
-    }
-    get_opened_file_args();
-  }, [updateCurrentFileList, updateCurrentIndex]);
 
   useEffect(() => {
     const unlisten = getCurrentWebview().onDragDropEvent(async (event) => {
@@ -190,6 +177,11 @@ function Index() {
     }
 
     function handleScroll(event: WheelEvent) {
+      const video = videoRef.current?.getInternalPlayer();
+      if (video && !video.contains(event.target as Node)) {
+        return;
+      }
+
       if (event.deltaY === -100) {
         increaseVolumeByStep();
       }
@@ -281,8 +273,31 @@ function Index() {
     videoDuration,
   ]);
 
+  const updateFileListAndIndex = useCallback(
+    (files: SelectedFileList, index: number) => {
+      updateCurrentFileList(files);
+      updateCurrentIndex(index);
+    },
+    [updateCurrentFileList, updateCurrentIndex]
+  );
+
   useEffect(() => {
-    if (currentFileList) {
+    async function get_opened_file_args() {
+      const files: [SelectedFileList, string] = await invoke(
+        "get_opened_file_args"
+      );
+      if (files) {
+        updateFileListAndIndex(
+          files[0],
+          files[0].findIndex((f) => f.filePath == files[1])
+        );
+      }
+    }
+    get_opened_file_args();
+  }, [updateFileListAndIndex]);
+
+  useEffect(() => {
+    if (currentFileList && currentFileList[currentIndex]) {
       updateCurrentVideo({
         name: currentFileList[currentIndex]?.fileName,
         url: convertFileSrc(currentFileList[currentIndex]?.filePath),
@@ -305,7 +320,7 @@ function Index() {
       }
     }
     recent();
-  }, [addRecentlyPlayed, currentFileList, currentIndex, video, currentVideo]);
+  }, [addRecentlyPlayed, currentFileList, currentIndex, video]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
