@@ -1,26 +1,22 @@
-import { OpenComponent, SelectedFile, SelectedFileList } from "@/lib/types";
+import { OpenComponent } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { Button } from "./ui/button";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
+import { CircleMinus } from "lucide-react";
 
-function Home({
-  recentlyPlayed,
-  updateCurrentFileList,
-  updateOpenComponent,
-  updateIsPlaying,
-  addRecentlyPlayed,
-  updateCurrentIndex,
-}: {
-  recentlyPlayed: SelectedFile[];
-  updateCurrentFileList: (state: SelectedFileList) => void;
-  updateOpenComponent: (state: OpenComponent) => void;
-  toggleVideoHidden: () => void;
-  updateIsPlaying: (state: boolean) => void;
-  addRecentlyPlayed: (file: SelectedFile) => void;
-  updateCurrentIndex: (state: number) => void;
-}) {
-  const { openFiles, toggleSettings } = usePlayerStore();
+function Home() {
+  const {
+    openFiles,
+    toggleSettings,
+    updateCurrentFileList,
+    updateCurrentIndex,
+    updateIsPlaying,
+    recentlyPlayed,
+    addRecentlyPlayed,
+    updateOpenComponent,
+    removeRecentlyPlayed,
+  } = usePlayerStore();
   return (
     <div className="flex flex-col w-full">
       <div className="pt-14 pb-4 px-4 w-full flex ">
@@ -41,7 +37,7 @@ function Home({
         {recentlyPlayed.map((video, index) => (
           <div
             key={index}
-            className="mt-4 flex hover:bg-foreground/5 flex-col w-44 p-1 h-60 rounded-lg cursor-pointer gap-1"
+            className="mt-4 group relative flex hover:bg-foreground/5 flex-col w-44 p-1 h-60 rounded-lg cursor-pointer gap-1"
             onClick={() => {
               updateCurrentFileList([recentlyPlayed[index]]);
 
@@ -62,6 +58,18 @@ function Home({
             <span className="text-xs px-1 pb-1 text-muted-foreground">
               {formatDuration(video.duration || 0)}
             </span>
+            <button
+              className="absolute right-2 top-2"
+              onClick={(e) => {
+                e.stopPropagation();
+                removeRecentlyPlayed(index);
+              }}
+            >
+              <CircleMinus
+                size={20}
+                className="text-accent-foreground opacity-0 rounded-full group-hover:bg-accent/50 group-hover:opacity-100 transition-opacity  "
+              />
+            </button>
           </div>
         ))}
       </div>

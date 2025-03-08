@@ -60,6 +60,7 @@ type Actions = {
   toggleVideoHidden: () => void;
   toggleLoop: () => void;
   addRecentlyPlayed: (file: SelectedFile) => void;
+  removeRecentlyPlayed: (index: number) => void;
 };
 
 const volumeStep = 0.05;
@@ -236,6 +237,17 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
       }
 
       return { recentlyPlayed: updatedList };
+    });
+    await store.set("recent", get().recentlyPlayed);
+    await store.save();
+  },
+  removeRecentlyPlayed: async (index) => {
+    set((state) => {
+      state.recentlyPlayed.filter((_, i) => index !== i);
+
+      return {
+        recentlyPlayed: state.recentlyPlayed.filter((_, i) => index !== i),
+      };
     });
     await store.set("recent", get().recentlyPlayed);
     await store.save();

@@ -88,7 +88,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                         >
                           <CircleMinus
                             size={15}
-                            className="text-accent-foreground opacity-0 group-hover:opacity-100 transition-opacity  "
+                            className="text-accent-foreground opacity-0 rounded-full group-hover:bg-accent/50 group-hover:opacity-100 transition-opacity  "
                           />
                         </button>
                       </div>

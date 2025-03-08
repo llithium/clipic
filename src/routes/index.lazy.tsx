@@ -30,7 +30,6 @@ function Index() {
     updateCurrentFileList,
     updateCurrentVideo,
     updateCurrentIndex,
-    updateIsPlaying,
     playPause,
     nextVideo,
     previousVideo,
@@ -42,11 +41,9 @@ function Index() {
     openFiles,
     shortcutsDisabled,
     toggleSettings,
-    recentlyPlayed,
     addRecentlyPlayed,
     openComponent,
     updateOpenComponent,
-    toggleVideoHidden,
     toggleHome,
     updateIsUiVisible,
   } = usePlayerStore();
@@ -300,17 +297,7 @@ function Index() {
       >
         <VideoPlayer video={video} videoRef={videoRef} />
       </section>
-      {openComponent === OpenComponent.Home && (
-        <Home
-          recentlyPlayed={recentlyPlayed}
-          updateCurrentFileList={updateCurrentFileList}
-          updateOpenComponent={updateOpenComponent}
-          toggleVideoHidden={toggleVideoHidden}
-          updateIsPlaying={updateIsPlaying}
-          addRecentlyPlayed={addRecentlyPlayed}
-          updateCurrentIndex={updateCurrentIndex}
-        />
-      )}
+      {openComponent === OpenComponent.Home && <Home />}
       {openComponent === OpenComponent.Settings && <Settings />}
       {openComponent === OpenComponent.Video && (
         <section
