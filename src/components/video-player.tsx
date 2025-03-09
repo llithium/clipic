@@ -11,13 +11,7 @@ export interface onProgressProps {
   loadedSeconds: number;
 }
 
-function VideoPlayer({
-  video,
-  videoRef,
-}: {
-  video: ReactPlayer | null;
-  videoRef: React.RefObject<ReactPlayer | null>;
-}) {
+function VideoPlayer({ ref }: { ref: React.RefObject<ReactPlayer | null> }) {
   const {
     openComponent,
     isMuted,
@@ -38,7 +32,7 @@ function VideoPlayer({
   }
 
   function handleClick(event: MouseEvent<HTMLDivElement>) {
-    if (event.target == videoRef.current?.getInternalPlayer()) {
+    if (event.target == ref.current?.getInternalPlayer()) {
       playPause();
     }
   }
@@ -54,9 +48,9 @@ function VideoPlayer({
         onClick={handleClick}
         className={`relative w-full h-full z-10 select-none`}
       >
-        <PlayerControls video={video} />
+        <PlayerControls videoRef={ref} />
         <ReactPlayer
-          ref={videoRef}
+          ref={ref}
           style={{ position: "absolute" }}
           width={"100%"}
           height={"100%"}
@@ -64,7 +58,9 @@ function VideoPlayer({
           playing={openComponent !== OpenComponent.Video ? false : isPlaying}
           volume={currentVolume}
           progressInterval={50}
-          onDuration={(duration) => updateVideoDuration(duration)}
+          onDuration={(duration) => {
+            updateVideoDuration(duration);
+          }}
           onProgress={(onProgressProps) => {
             handleProgress(onProgressProps);
           }}

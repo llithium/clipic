@@ -102,6 +102,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
         url: convertFileSrc(fileList[index].filePath),
       },
       openComponent: OpenComponent.Video,
+      isPlaying: true,
     }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
   updateCurrentIndex: (state) => {

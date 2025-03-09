@@ -26,7 +26,6 @@ function Index() {
     currentFileList,
     currentVideo,
     currentIndex,
-    videoDuration,
     updateCurrentFileList,
     playPause,
     nextVideo,
@@ -49,7 +48,6 @@ function Index() {
   const videoRef = useRef<ReactPlayer>(null);
   const draggableRef = useRef<HTMLDivElement>(null);
 
-  const video = videoRef.current;
   const sidePanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -124,24 +122,29 @@ function Index() {
       }
       if (keybinds.seekBackward.includes(event.key)) {
         event.preventDefault();
-        const currentTime = video?.getCurrentTime() || 0;
-        video?.seekTo(Math.max(currentTime - 5, 0), "seconds");
+        const currentTime = videoRef.current?.getCurrentTime() || 0;
+        videoRef.current?.seekTo(Math.max(currentTime - 5, 0), "seconds");
       }
       if (keybinds.seekForward.includes(event.key)) {
         event.preventDefault();
-        const currentTime = video?.getCurrentTime() || 0;
-
-        video?.seekTo(Math.min(currentTime + 5, videoDuration), "seconds");
+        const currentTime = videoRef.current?.getCurrentTime() || 0;
+        videoRef.current?.seekTo(
+          Math.min(currentTime + 5, videoRef.current.getDuration()),
+          "seconds"
+        );
       }
       if (keybinds.longSeekBackward.includes(event.key)) {
         event.preventDefault();
-        const currentTime = video?.getCurrentTime() || 0;
-        video?.seekTo(Math.max(currentTime - 30, 0), "seconds");
+        const currentTime = videoRef.current?.getCurrentTime() || 0;
+        videoRef.current?.seekTo(Math.max(currentTime - 30, 0), "seconds");
       }
       if (keybinds.longSeekForward.includes(event.key)) {
         event.preventDefault();
-        const currentTime = video?.getCurrentTime() || 0;
-        video?.seekTo(Math.min(currentTime + 30, videoDuration), "seconds");
+        const currentTime = videoRef.current?.getCurrentTime() || 0;
+        videoRef.current?.seekTo(
+          Math.min(currentTime + 30, videoRef.current.getDuration()),
+          "seconds"
+        );
       }
 
       if (keybinds.mute.includes(event.key)) {
@@ -267,7 +270,7 @@ function Index() {
       const withThumbnail: SelectedFileList = (await generateThumbnails([
         currentFileList[currentIndex],
       ])) as SelectedFileList;
-      withThumbnail[0].duration = video?.getDuration();
+      withThumbnail[0].duration = videoRef.current?.getDuration();
       addRecentlyPlayed(withThumbnail[0]);
     }
   }, [currentFileList, currentIndex]);
@@ -283,7 +286,7 @@ function Index() {
           openComponent === OpenComponent.Video && "w-full h-full"
         } transition-all`}
       >
-        <VideoPlayer video={video} videoRef={videoRef} />
+        <VideoPlayer ref={videoRef} />
       </section>
       {openComponent === OpenComponent.Home && <Home />}
       {openComponent === OpenComponent.Settings && <Settings />}

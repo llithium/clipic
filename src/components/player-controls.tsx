@@ -13,7 +13,11 @@ import { Slider } from "./ui/slider";
 
 const tooltipWidth = 80;
 
-function PlayerControls({ video }: { video: ReactPlayer | null }) {
+function PlayerControls({
+  videoRef,
+}: {
+  videoRef: React.RefObject<ReactPlayer | null>;
+}) {
   const {
     currentFileList,
     currentIndex,
@@ -39,7 +43,7 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     isUiVisible,
   } = usePlayerStore();
   function handleSeek(value: number[]) {
-    video?.seekTo(value[0], "fraction");
+    videoRef.current?.seekTo(value[0], "fraction");
   }
 
   function handleVolumeSlider(value: number[]) {
@@ -71,7 +75,8 @@ function PlayerControls({ video }: { video: ReactPlayer | null }) {
     updateCurrentTooltipLeft(tooltipLeft);
 
     const hoveredTime =
-      video && formatDuration(video?.getDuration() * fraction);
+      videoRef.current &&
+      formatDuration(videoRef.current?.getDuration() * fraction);
     updateHoveredTime(hoveredTime || "0");
   }
 
