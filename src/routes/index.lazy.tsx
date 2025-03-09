@@ -41,7 +41,6 @@ function Index() {
     toggleSettings,
     addRecentlyPlayed,
     openComponent,
-    updateOpenComponent,
     toggleHome,
     updateIsUiVisible,
   } = usePlayerStore();
@@ -265,9 +264,6 @@ function Index() {
 
   const updateOnVideoChange = useCallback(async () => {
     if (currentFileList) {
-      if (currentFileList.length > 0 && openComponent !== OpenComponent.Video) {
-        updateOpenComponent(OpenComponent.Video);
-      }
       const withThumbnail: SelectedFileList = (await generateThumbnails([
         currentFileList[currentIndex],
       ])) as SelectedFileList;

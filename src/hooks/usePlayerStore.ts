@@ -101,6 +101,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
         extension: fileList[index].fileExtension,
         url: convertFileSrc(fileList[index].filePath),
       },
+      openComponent: OpenComponent.Video,
     }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
   updateCurrentIndex: (state) => {
@@ -112,6 +113,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
         url: convertFileSrc(fileList[state].filePath),
         extension: fileList[state].fileExtension,
       },
+      openComponent: OpenComponent.Video,
     });
   },
   updateIsPlaying: (state) => set({ isPlaying: state }),

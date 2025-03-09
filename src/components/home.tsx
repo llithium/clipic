@@ -1,4 +1,3 @@
-import { OpenComponent } from "@/lib/types";
 import { formatDuration } from "@/lib/utils";
 import { convertFileSrc } from "@tauri-apps/api/core";
 import { Button } from "./ui/button";
@@ -12,7 +11,6 @@ function Home() {
     updateCurrentFileList,
     updateIsPlaying,
     recentlyPlayed,
-    updateOpenComponent,
     removeRecentlyPlayed,
   } = usePlayerStore();
   return (
@@ -38,7 +36,6 @@ function Home() {
             className="mt-4 group relative flex hover:bg-foreground/5 flex-col w-44 p-1 h-60 rounded-lg cursor-pointer gap-1"
             onClick={() => {
               updateCurrentFileList([recentlyPlayed[index]]);
-              updateOpenComponent(OpenComponent.Video);
               updateIsPlaying(true);
             }}
           >
