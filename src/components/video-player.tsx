@@ -24,6 +24,7 @@ function VideoPlayer({ ref }: { ref: React.RefObject<ReactPlayer | null> }) {
     updatePlayedSeconds,
     updateVideoDuration,
     playPause,
+    updatePlayerReady,
   } = usePlayerStore();
 
   function handleProgress(progress: onProgressProps) {
@@ -51,6 +52,7 @@ function VideoPlayer({ ref }: { ref: React.RefObject<ReactPlayer | null> }) {
         <PlayerControls videoRef={ref} />
         <ReactPlayer
           ref={ref}
+          onReady={() => updatePlayerReady(true)}
           style={{ position: "absolute" }}
           width={"100%"}
           height={"100%"}

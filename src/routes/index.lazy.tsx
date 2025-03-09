@@ -42,6 +42,7 @@ function Index() {
     openComponent,
     toggleHome,
     updateIsUiVisible,
+    playerReady,
   } = usePlayerStore();
   const { keybinds } = useSettingsStore();
 
@@ -213,9 +214,12 @@ function Index() {
       draggable?.removeEventListener("mousedown", handleDragMain);
       window.removeEventListener("mousedown", handleMouseDown);
     };
-  }, []);
+  }, [playerReady]);
 
   useEffect(() => {
+    if (!playerReady) {
+      return;
+    }
     const handleMouseMove = () => {
       document.body.style.cursor = "default";
       updateIsUiVisible(true);
@@ -250,7 +254,7 @@ function Index() {
         clearTimeout(mouseMoveTimeout);
       }
     };
-  }, [updateIsUiVisible]);
+  }, [updateIsUiVisible, playerReady]);
 
   useEffect(() => {
     async function get_opened_file_args() {
@@ -266,6 +270,9 @@ function Index() {
   }, []);
 
   const updateOnVideoChange = useCallback(async () => {
+    if (!playerReady) {
+      return;
+    }
     if (currentFileList) {
       const withThumbnail: SelectedFileList = (await generateThumbnails([
         currentFileList[currentIndex],
@@ -273,7 +280,7 @@ function Index() {
       withThumbnail[0].duration = videoRef.current?.getDuration();
       addRecentlyPlayed(withThumbnail[0]);
     }
-  }, [currentFileList, currentIndex]);
+  }, [currentFileList, currentIndex, playerReady]);
 
   useEffect(() => {
     updateOnVideoChange();

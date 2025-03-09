@@ -29,6 +29,7 @@ type State = {
   openComponent: OpenComponent;
   previousComponent: OpenComponent;
   isUiVisible: boolean;
+  playerReady: boolean;
 };
 
 type Actions = {
@@ -46,6 +47,7 @@ type Actions = {
   updateShortcutsDisabled: (state: boolean) => void;
   updateOpenComponent: (state: OpenComponent) => void;
   updateIsUiVisible: (state: boolean) => void;
+  updatePlayerReady: (state: boolean) => void;
 
   playPause: () => void;
   nextVideo: () => void;
@@ -91,6 +93,7 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   openComponent: OpenComponent.Home,
   previousComponent: OpenComponent.None,
   isUiVisible: true,
+  playerReady: false,
 
   updateCurrentFileList: (fileList, index = 0) =>
     set({
@@ -280,4 +283,5 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
     });
   },
   updateIsUiVisible: (state) => set({ isUiVisible: state }),
+  updatePlayerReady: (state) => set({ playerReady: state }),
 }));
