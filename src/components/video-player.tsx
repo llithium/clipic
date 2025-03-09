@@ -1,8 +1,9 @@
 import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
-import { OpenComponent } from "@/lib/types";
+import { OpenComponent, SelectedFileList } from "@/lib/types";
 import PlayerControls from "@/components/player-controls";
-import { MouseEvent } from "react";
+import { MouseEvent, useEffect } from "react";
+import { generateThumbnails } from "@/lib/utils";
 
 export interface onProgressProps {
   played: number;
@@ -25,6 +26,11 @@ function VideoPlayer({ ref }: { ref: React.RefObject<ReactPlayer | null> }) {
     updateVideoDuration,
     playPause,
     updatePlayerReady,
+    addRecentlyPlayed,
+    currentFileList,
+    currentIndex,
+    videoDuration,
+    playerReady,
   } = usePlayerStore();
 
   function handleProgress(progress: onProgressProps) {
@@ -37,7 +43,19 @@ function VideoPlayer({ ref }: { ref: React.RefObject<ReactPlayer | null> }) {
       playPause();
     }
   }
-
+  useEffect(() => {
+    if (!playerReady || videoDuration <= 0) {
+      return;
+    }
+    const generateAndAddThumbnail = async () => {
+      const withThumbnail: SelectedFileList = (await generateThumbnails([
+        currentFileList[currentIndex],
+      ])) as SelectedFileList;
+      withThumbnail[0].duration = videoDuration;
+      addRecentlyPlayed(withThumbnail[0]);
+    };
+    generateAndAddThumbnail();
+  }, [videoDuration]);
   return (
     <div
       className={`w-full h-full ${

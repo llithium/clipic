@@ -1,5 +1,5 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
@@ -10,7 +10,6 @@ import { ResizablePanelGroup } from "@/components/ui/resizable";
 import SidePanel from "@/components/side-panel";
 import Settings from "@/components/ui/settings";
 import { useSettingsStore } from "@/hooks/useSettingsStore";
-import { generateThumbnails } from "@/lib/utils";
 import Home from "@/components/home";
 import VideoPlayer from "@/components/video-player";
 import { ACCEPTED_EXTENSIONS } from "@/lib/constants";
@@ -38,7 +37,6 @@ function Index() {
     openFiles,
     shortcutsDisabled,
     toggleSettings,
-    addRecentlyPlayed,
     openComponent,
     toggleHome,
     updateIsUiVisible,
@@ -268,23 +266,6 @@ function Index() {
     }
     get_opened_file_args();
   }, []);
-
-  const updateOnVideoChange = useCallback(async () => {
-    if (!playerReady) {
-      return;
-    }
-    if (currentFileList) {
-      const withThumbnail: SelectedFileList = (await generateThumbnails([
-        currentFileList[currentIndex],
-      ])) as SelectedFileList;
-      withThumbnail[0].duration = videoRef.current?.getDuration();
-      addRecentlyPlayed(withThumbnail[0]);
-    }
-  }, [currentFileList, currentIndex, playerReady]);
-
-  useEffect(() => {
-    updateOnVideoChange();
-  }, [updateOnVideoChange]);
 
   return (
     <ResizablePanelGroup direction="horizontal">
