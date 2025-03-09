@@ -8,12 +8,8 @@ import { CircleMinus } from "lucide-react";
 type SidePanelProps = object;
 
 const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
-  const {
-    currentFileList,
-    updateCurrentFileList,
-    currentIndex,
-    updateCurrentIndex,
-  } = usePlayerStore();
+  const { currentFileList, updateCurrentFileList, currentIndex } =
+    usePlayerStore();
 
   const onDragEnd = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -28,13 +24,12 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
         result.source.index,
         result.destination.index
       );
-      updateCurrentFileList(updatedFileList);
       const newIndex = updatedFileList.findIndex(
         (video) => video.filePath === currentVideoId
       );
-      updateCurrentIndex(newIndex);
+      updateCurrentFileList(updatedFileList, newIndex);
     },
-    [currentFileList, currentIndex, updateCurrentFileList, updateCurrentIndex]
+    [currentFileList, currentIndex, updateCurrentFileList]
   );
 
   const reorder = (
@@ -71,7 +66,7 @@ const SidePanel = forwardRef<HTMLDivElement, SidePanelProps>((_props, ref) => {
                       className={`draggable-item hover:bg-accent group cursor-pointer active:opacity-60 transition-all px-2 py-2 mb-1 rounded-lg ${
                         currentIndex === i && "bg-secondary"
                       }`}
-                      onClick={() => updateCurrentIndex(i)}
+                      onClick={() => updateCurrentFileList(currentFileList, i)}
                     >
                       <div className="text-xs relative overflow-hidden overflow-ellipsis whitespace-nowrap w-[260px]">
                         <span className="group-hover:opacity-40">

@@ -1,6 +1,6 @@
 import { createLazyFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef } from "react";
-import { convertFileSrc, invoke } from "@tauri-apps/api/core";
+import { invoke } from "@tauri-apps/api/core";
 import ReactPlayer from "react-player";
 import { usePlayerStore } from "@/hooks/usePlayerStore";
 import { OpenComponent, SelectedFileList } from "@/lib/types";
@@ -28,8 +28,6 @@ function Index() {
     currentIndex,
     videoDuration,
     updateCurrentFileList,
-    updateCurrentVideo,
-    updateCurrentIndex,
     playPause,
     nextVideo,
     previousVideo,
@@ -95,7 +93,7 @@ function Index() {
           const newIndex = updatedFileList.findIndex(
             (video) => video.filePath === currentVideoPath
           );
-          updateFileListAndIndex(updatedFileList, newIndex);
+          updateCurrentFileList(updatedFileList, newIndex);
         } else {
           updateCurrentFileList(fileList);
         }
@@ -218,14 +216,6 @@ function Index() {
     };
   }, []);
 
-  const updateFileListAndIndex = useCallback(
-    (files: SelectedFileList, index: number) => {
-      updateCurrentFileList(files);
-      updateCurrentIndex(index);
-    },
-    [updateCurrentFileList, updateCurrentIndex]
-  );
-
   useEffect(() => {
     const handleMouseMove = () => {
       document.body.style.cursor = "default";
@@ -257,22 +247,15 @@ function Index() {
         "get_opened_file_args"
       );
       if (files) {
-        updateFileListAndIndex(
-          files[0],
-          files[0].findIndex((f) => f.filePath == files[1])
-        );
+        const index = files[0].findIndex((f) => f.filePath == files[1]);
+        updateCurrentFileList(files[0], index);
       }
     }
     get_opened_file_args();
-  }, [updateFileListAndIndex]);
+  }, []);
 
   const updateOnVideoChange = useCallback(async () => {
     if (currentFileList) {
-      updateCurrentVideo({
-        name: currentFileList[currentIndex]?.fileName,
-        url: convertFileSrc(currentFileList[currentIndex]?.filePath),
-        extension: currentFileList[currentIndex]?.fileExtension,
-      });
       if (currentFileList.length > 0) {
         updateOpenComponent(OpenComponent.Video);
       }
@@ -291,7 +274,7 @@ function Index() {
   return (
     <ResizablePanelGroup direction="horizontal">
       <section
-        className={` ${
+        className={`${
           openComponent === OpenComponent.Video && "w-full h-full"
         } transition-all`}
       >

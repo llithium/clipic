@@ -6,6 +6,7 @@ import {
   SelectedFile,
   OpenComponent,
 } from "@/lib/types";
+import { convertFileSrc } from "@tauri-apps/api/core";
 import { load } from "@tauri-apps/plugin-store";
 import { create } from "zustand";
 
@@ -31,7 +32,7 @@ type State = {
 };
 
 type Actions = {
-  updateCurrentFileList: (state: SelectedFileList) => void;
+  updateCurrentFileList: (fileList: SelectedFileList, index?: number) => void;
   updateCurrentVideo: (state: CurrentVideo) => void;
   updateCurrentIndex: (state: number) => void;
   updateIsPlaying: (state: boolean) => void;
@@ -91,9 +92,28 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   previousComponent: OpenComponent.None,
   isUiVisible: true,
 
-  updateCurrentFileList: (state) => set({ currentFileList: state }),
+  updateCurrentFileList: (fileList, index = 0) =>
+    set({
+      currentFileList: fileList,
+      currentIndex: index,
+      currentVideo: {
+        name: fileList[index].fileName,
+        extension: fileList[index].fileExtension,
+        url: convertFileSrc(fileList[index].filePath),
+      },
+    }),
   updateCurrentVideo: (state) => set({ currentVideo: state }),
-  updateCurrentIndex: (state) => set({ currentIndex: state }),
+  updateCurrentIndex: (state) => {
+    const fileList = get().currentFileList;
+    set({
+      currentIndex: state,
+      currentVideo: {
+        name: fileList[state].fileName,
+        url: convertFileSrc(fileList[state].filePath),
+        extension: fileList[state].fileExtension,
+      },
+    });
+  },
   updateIsPlaying: (state) => set({ isPlaying: state }),
   updateSliderValue: (state) => set({ sliderValue: state }),
   updateHoveredTime: (state) => set({ hoveredTime: state }),
@@ -113,17 +133,17 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   updateShortcutsDisabled: (state) => set({ shortcutsDisabled: state }),
 
   playPause: () => set((state) => ({ isPlaying: !state.isPlaying })),
-  nextVideo: () =>
-    set((state) => ({
-      currentIndex: Math.min(
-        state.currentIndex + 1,
-        state.currentFileList.length - 1
-      ),
-    })),
-  previousVideo: () =>
+  nextVideo: () => {
+    get().updateCurrentIndex(
+      Math.min(get().currentIndex + 1, get().currentFileList.length - 1)
+    );
+  },
+  previousVideo: () => {
+    get().updateCurrentIndex(Math.max(get().currentIndex - 1, 0));
     set((state) => ({
       currentIndex: Math.max(state.currentIndex - 1, 0),
-    })),
+    }));
+  },
   increaseVolumeByStep: async () => {
     set((state) => ({
       currentVolume: Math.min(state.currentVolume + volumeStep, 1),
@@ -165,20 +185,20 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   },
   openFiles: async () => {
     const fileList: SelectedFileList = await getFiles();
+
     if (fileList.length > 0) {
+      get().updateCurrentFileList(fileList);
       set({
-        currentFileList: fileList,
         openComponent: OpenComponent.Video,
         isPlaying: true,
-        currentIndex: 0,
       });
     }
   },
   openDirectory: async () => {
     const fileList: SelectedFileList = await getFiles(true);
     if (fileList.length > 0) {
+      get().updateCurrentFileList(fileList);
       set({
-        currentFileList: fileList,
         openComponent: OpenComponent.Video,
         isPlaying: true,
         currentIndex: 0,

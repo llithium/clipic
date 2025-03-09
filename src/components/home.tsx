@@ -10,7 +10,6 @@ function Home() {
     openFiles,
     toggleSettings,
     updateCurrentFileList,
-    updateCurrentIndex,
     updateIsPlaying,
     recentlyPlayed,
     addRecentlyPlayed,
@@ -40,8 +39,6 @@ function Home() {
             className="mt-4 group relative flex hover:bg-foreground/5 flex-col w-44 p-1 h-60 rounded-lg cursor-pointer gap-1"
             onClick={() => {
               updateCurrentFileList([recentlyPlayed[index]]);
-
-              updateCurrentIndex(0);
               addRecentlyPlayed(recentlyPlayed[index]);
               updateOpenComponent(OpenComponent.Video);
               updateIsPlaying(true);
