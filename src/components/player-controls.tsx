@@ -82,7 +82,8 @@ function PlayerControls({
 
   return (
     <div
-      className={`absolute bottom-0 z-20 pb-2 pt-6 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 ${
+      data-tauri-drag-region
+      className={`absolute bottom-0 z-20 pb-2 flex-col gap-2 w-full h-fit bg-gradient-to-t from-black/30 opacity-0 ${
         (isUiVisible || !isPlaying) && "opacity-100"
       }  transition-opacity duration-700 ease-fast-out hover:opacity-100 ${
         !currentVideo?.name ? "hidden" : "flex"
@@ -114,7 +115,10 @@ function PlayerControls({
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>
-      <div className="flex items-center justify-between px-2 relative z-20">
+      <div
+        data-tauri-drag-region
+        className="flex items-center justify-between px-2 relative z-20"
+      >
         <div className="flex gap-2 items-center">
           {currentIndex > 0 ? (
             <Button

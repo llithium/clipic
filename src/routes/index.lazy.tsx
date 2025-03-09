@@ -41,6 +41,7 @@ function Index() {
     toggleHome,
     updateIsUiVisible,
     playerReady,
+    videoDuration,
   } = usePlayerStore();
   const { keybinds } = useSettingsStore();
 
@@ -128,7 +129,7 @@ function Index() {
         event.preventDefault();
         const currentTime = videoRef.current?.getCurrentTime() || 0;
         videoRef.current?.seekTo(
-          Math.min(currentTime + 5, videoRef.current.getDuration()),
+          Math.min(currentTime + 5, videoDuration),
           "seconds"
         );
       }
@@ -141,7 +142,7 @@ function Index() {
         event.preventDefault();
         const currentTime = videoRef.current?.getCurrentTime() || 0;
         videoRef.current?.seekTo(
-          Math.min(currentTime + 30, videoRef.current.getDuration()),
+          Math.min(currentTime + 30, videoDuration),
           "seconds"
         );
       }
@@ -212,7 +213,7 @@ function Index() {
       draggable?.removeEventListener("mousedown", handleDragMain);
       window.removeEventListener("mousedown", handleMouseDown);
     };
-  }, [playerReady]);
+  }, [playerReady, videoDuration]);
 
   useEffect(() => {
     if (!playerReady) {
