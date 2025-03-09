@@ -210,9 +210,6 @@ function Index() {
       window.removeEventListener("wheel", handleScroll);
       draggable?.removeEventListener("mousedown", handleDragMain);
       window.removeEventListener("mousedown", handleMouseDown);
-      if (mouseMoveTimeout) {
-        clearTimeout(mouseMoveTimeout);
-      }
     };
   }, []);
 
@@ -231,10 +228,22 @@ function Index() {
       }, 3000);
     };
 
+    const handleMouseExit = (event: MouseEvent) => {
+      if (
+        !event.relatedTarget ||
+        (event.relatedTarget as Node).nodeName === "HTML"
+      ) {
+        updateIsUiVisible(false);
+      }
+    };
+
     window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseout", handleMouseExit);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseout", handleMouseExit);
+
       if (mouseMoveTimeout) {
         clearTimeout(mouseMoveTimeout);
       }
@@ -256,7 +265,7 @@ function Index() {
 
   const updateOnVideoChange = useCallback(async () => {
     if (currentFileList) {
-      if (currentFileList.length > 0) {
+      if (currentFileList.length > 0 && openComponent !== OpenComponent.Video) {
         updateOpenComponent(OpenComponent.Video);
       }
       const withThumbnail: SelectedFileList = (await generateThumbnails([

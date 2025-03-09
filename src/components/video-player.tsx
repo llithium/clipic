@@ -36,11 +36,13 @@ function VideoPlayer({
     updateSliderValue([progress.played]);
     updatePlayedSeconds(progress.playedSeconds);
   }
+
   function handleClick(event: MouseEvent<HTMLDivElement>) {
     if (event.target == videoRef.current?.getInternalPlayer()) {
       playPause();
     }
   }
+
   return (
     <div
       className={`w-full h-full ${

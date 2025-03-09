@@ -140,9 +140,6 @@ export const usePlayerStore = create<State & Actions>((set, get) => ({
   },
   previousVideo: () => {
     get().updateCurrentIndex(Math.max(get().currentIndex - 1, 0));
-    set((state) => ({
-      currentIndex: Math.max(state.currentIndex - 1, 0),
-    }));
   },
   increaseVolumeByStep: async () => {
     set((state) => ({
